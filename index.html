@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Sports Impostor</title>
+<style>
+:root{--bg:#0b0a10;--card:#17141f;--card2:#201b2e;--line:#2e2745;--pu:#a855f7;--pu2:#7c3aed;--tx:#fff;--mu:#b4aecb;--ok:#4ade80;--bad:#fb7185;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+body{background:radial-gradient(900px 500px at 50% -10%,color-mix(in srgb,var(--pu2) 40%,transparent),transparent),var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+#app{max-width:560px;margin:0 auto;padding:16px 16px 40px;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1,h2,h3{margin:0;font-weight:900;letter-spacing:-.02em;text-transform:uppercase}
+h1{font-size:clamp(2.4rem,11vw,3.6rem);line-height:.95}h2{font-size:1.6rem}h3{font-size:.8rem;letter-spacing:.14em;color:var(--mu);margin:20px 0 8px}
+.glow{color:var(--pu);text-shadow:0 0 24px color-mix(in srgb,var(--pu) 53%,transparent)}
+.card{background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}
+.btn{display:block;width:100%;min-height:56px;border:0;border-radius:14px;font:800 1.05rem system-ui;text-transform:uppercase;letter-spacing:.06em;color:var(--on,#fff);background:linear-gradient(135deg,var(--pu2),var(--pu));box-shadow:0 0 22px color-mix(in srgb,var(--pu) 27%,transparent);cursor:pointer;margin:10px 0;transition:transform .08s}
+.btn:active{transform:scale(.98)}.btn.alt{background:var(--card2);border:1px solid var(--line);box-shadow:none}.btn.sm{min-height:44px;font-size:.85rem;width:auto;display:inline-block;padding:0 16px;margin:4px 4px 4px 0}
+.btn.ok,.btn.bad,.btn.alt{color:#fff}.btn.ok{background:#16a34a}.btn.bad{background:#be123c}
+button:focus-visible,input:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sp{justify-content:space-between}
+.chip{flex:1;min-width:84px;min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--mu);font:700 .9rem system-ui;cursor:pointer}
+.chip.on{background:color-mix(in srgb,var(--pu) 13%,transparent);border-color:var(--pu);color:#fff;box-shadow:0 0 14px color-mix(in srgb,var(--pu) 27%,transparent)}
+.step{display:flex;align-items:center;gap:10px}.step button{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:#fff;font-size:1.4rem;cursor:pointer}.step b{min-width:2ch;text-align:center;font-size:1.3rem}
+input[type=text],input[type=number]{width:100%;min-height:46px;border-radius:12px;border:1px solid var(--line);background:color-mix(in srgb,var(--bg) 60%,#000);color:#fff;font:600 1rem system-ui;padding:0 12px}
+.mu{color:var(--mu)}.small{font-size:.85rem}.center{text-align:center}
+.badge{display:inline-grid;place-items:center;min-width:44px;height:30px;padding:0 8px;border-radius:8px;background:color-mix(in srgb,var(--pu) 13%,transparent);border:1px solid var(--pu);font:900 .75rem system-ui;letter-spacing:.08em}
+.big{font-size:clamp(2rem,10vw,3rem);font-weight:900;line-height:1.05;text-transform:uppercase}
+.secret{border:2px solid var(--pu);box-shadow:0 0 40px color-mix(in srgb,var(--pu) 33%,transparent);text-align:center;padding:28px 16px}
+.imp{border-color:var(--bad);box-shadow:0 0 40px #fb718555}
+.lock{background:repeating-linear-gradient(135deg,var(--card),var(--card) 12px,var(--card2) 12px,var(--card2) 24px);text-align:center;padding:28px 16px}
+.bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.bar button{background:none;border:0;color:var(--mu);font:700 .8rem system-ui;text-transform:uppercase;letter-spacing:.08em;min-height:44px;cursor:pointer;padding:0 6px}
+.lb div{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}.lb div:last-child{border:0}
+.tag{padding:2px 8px;border-radius:99px;font-size:.75rem;font-weight:800;background:var(--card);border:1px solid var(--line)}
+.turn{display:flex;gap:6px;flex-wrap:wrap}.turn span{padding:6px 10px;border-radius:99px;border:1px solid var(--line);font-size:.85rem;color:var(--mu)}.turn .d{opacity:.45;text-decoration:line-through}.turn .c{background:var(--pu2);color:#fff;border-color:var(--pu)}
+.err{color:var(--bad);font-weight:700}
+.tile{flex:1 1 40%;min-width:130px;text-align:left;color:#fff;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;cursor:pointer;font:inherit}.tile.on{border-color:var(--pu);background:color-mix(in srgb,var(--pu) 13%,transparent);box-shadow:0 0 18px color-mix(in srgb,var(--pu) 27%,transparent)}
+.modal{position:fixed;inset:0;background:#000b;display:grid;place-items:center;padding:20px;z-index:50}.modal .card{max-width:380px;width:100%;margin:0}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(#ffffff09 1px,transparent 1px),linear-gradient(90deg,#ffffff09 1px,transparent 1px);background-size:36px 36px;-webkit-mask-image:radial-gradient(circle at 50% 0,#000,transparent 75%);mask-image:radial-gradient(circle at 50% 0,#000,transparent 75%)}
+#app{position:relative}
+.floaters{display:flex;gap:14px;margin-bottom:16px}.floaters span{width:46px;height:46px;color:var(--c);filter:drop-shadow(0 0 8px var(--c));animation:fl 3.6s ease-in-out infinite}.floaters span:nth-child(2){animation-delay:.4s}.floaters span:nth-child(3){animation-delay:.8s}.floaters span:nth-child(4){animation-delay:1.2s}
+@keyframes fl{50%{transform:translateY(-7px) rotate(7deg)}}
+.floaters svg,.wm svg,.ico svg,.mi svg{width:100%;height:100%;display:block}
+.tile{position:relative;overflow:hidden;transition:transform .1s}.tile:active{transform:scale(.97)}.tile .wm{position:absolute;right:-16px;bottom:-16px;width:96px;height:96px;color:var(--c);opacity:.13;transform:rotate(-12deg)}
+.tile .ico{display:inline-block;width:40px;height:40px;color:var(--c);vertical-align:middle;filter:drop-shadow(0 0 6px var(--c))}.tile.on{border-color:var(--c);background:linear-gradient(150deg,color-mix(in srgb,var(--c) 22%,var(--card)),var(--card));box-shadow:0 0 22px color-mix(in srgb,var(--c) 35%,transparent)}
+.chip.on{border-color:var(--c,var(--pu))}.mi{display:inline-block;width:18px;height:18px;vertical-align:-4px;margin-right:6px;color:var(--c,var(--pu))}
+.secret{position:relative;overflow:hidden}.secret .wm{position:absolute;right:-24px;bottom:-34px;width:190px;height:190px;color:var(--c);opacity:.12;transform:rotate(-14deg)}
+.hintbox{margin-top:16px;padding:12px;border:1px dashed var(--pu);border-radius:12px;background:color-mix(in srgb,var(--pu) 8%,transparent);text-align:left}
+h1{background:linear-gradient(180deg,#fff,#d8c4ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}h1 .glow{-webkit-text-fill-color:var(--pu)}
+.btn:not(.alt):not(.ok):not(.bad){background:linear-gradient(135deg,var(--pu2),var(--pu))}
+#bg{position:fixed;right:-70px;bottom:-70px;width:360px;height:360px;color:var(--pu);opacity:.08;pointer-events:none;transform:rotate(-14deg)}#bg svg{width:100%;height:100%}
+.banner{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:16px;border:1px solid var(--pu);background:linear-gradient(120deg,color-mix(in srgb,var(--pu) 30%,var(--card)),var(--card));margin:4px 0 10px;box-shadow:0 0 22px color-mix(in srgb,var(--pu) 30%,transparent)}
+.banner .ico{display:flex;gap:6px;color:var(--pu);filter:drop-shadow(0 0 8px var(--pu))}.banner .ico>svg{width:46px;height:46px}.banner .mi{width:30px;height:30px;margin:0;vertical-align:baseline}.banner .mi svg{width:30px;height:30px}.banner b{font-size:1.3rem;text-transform:uppercase;letter-spacing:.05em;font-weight:900}
+body[data-t]{background:radial-gradient(900px 500px at 50% -10%,color-mix(in srgb,var(--pu2) 45%,transparent),transparent),var(--bg)}
+body[data-t]::before{-webkit-mask-image:none;mask-image:none;background-size:auto}
+body[data-t=football]{--bg:#06130b;--card:#0c1f13;--card2:#12301d;--line:#24573a;--pu:#22c55e;--pu2:#15803d;--mu:#a9c9b4;--on:#03140a}
+body[data-t=football]::before{background-image:repeating-linear-gradient(90deg,#ffffff08 0 64px,transparent 64px 128px),radial-gradient(circle at 50% 108%,transparent 150px,#ffffff1c 151px 154px,transparent 155px)}
+body[data-t=football] .card{border-left:4px solid var(--pu)}
+body[data-t=basketball]{--bg:#150a04;--card:#22130a;--card2:#351d0e;--line:#6b3a17;--pu:#fb923c;--pu2:#c2410c;--mu:#d6b9a1;--on:#1a0a02}
+body[data-t=basketball]::before{background-image:repeating-linear-gradient(90deg,#ffffff07 0 2px,transparent 2px 40px),radial-gradient(circle at 50% 108%,transparent 190px,#ffffff20 191px 194px,transparent 195px),radial-gradient(circle at 50% 108%,transparent 80px,#ffffff20 81px 84px,transparent 85px)}
+body[data-t=basketball] .card,body[data-t=basketball] .banner{border-radius:30px}body[data-t=basketball] .btn,body[data-t=basketball] .chip{border-radius:999px}
+body[data-t=ufc]{--bg:#0c0405;--card:#1a0a0c;--card2:#2b0e12;--line:#5a1820;--pu:#ef4444;--pu2:#991b1b;--mu:#d2a9ad;--on:#fff}
+body[data-t=ufc]::before{background-image:repeating-linear-gradient(45deg,#ffffff09 0 2px,transparent 2px 24px),repeating-linear-gradient(-45deg,#ffffff09 0 2px,transparent 2px 24px)}
+body[data-t=ufc] .card,body[data-t=ufc] .banner{border-radius:3px;clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px))}
+body[data-t=ufc] .btn,body[data-t=ufc] .chip{border-radius:3px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+body[data-t=ufc] h2,body[data-t=ufc] .big{font-style:italic}
+body[data-t=wwe]{--bg:#05070f;--card:#0c1124;--card2:#151c3d;--line:#2d3970;--pu:#facc15;--pu2:#ca8a04;--mu:#b0b9dc;--on:#1a1400}
+body[data-t=wwe]::before{background-image:conic-gradient(from 160deg at 50% -8%,transparent 0 15deg,#facc1530 28deg,transparent 40deg 70deg,#60a5fa30 85deg,transparent 100deg 130deg,#facc1530 142deg,transparent 155deg)}
+body[data-t=wwe] .card,body[data-t=wwe] .banner{box-shadow:inset 0 0 0 3px var(--card),inset 0 0 0 4px color-mix(in srgb,var(--pu) 55%,transparent)}
+body[data-t=wwe] h2,body[data-t=wwe] .big{letter-spacing:.06em}
+.chaos{display:inline-block;margin-top:6px;padding:2px 8px;border:1px dashed var(--pu);border-radius:6px;font:900 .68rem system-ui;letter-spacing:.14em;color:var(--pu);animation:glitch 2.6s infinite steps(1)}
+@keyframes glitch{0%,90%,100%{transform:none}92%{transform:translateX(-3px) skewX(8deg)}95%{transform:translateX(3px)}}
+.chaoscard{animation:gin .45s both}@keyframes gin{0%{transform:translateX(-8px) skewX(6deg);opacity:0}50%{transform:translateX(5px)}100%{transform:none;opacity:1}}
+.chaoscard .rule{font-size:1.35rem;font-weight:900;line-height:1.2;margin:4px 0 8px}
+.shoth{font-size:clamp(2.4rem,12vw,3.6rem);margin:12px 0;color:var(--pu);animation:shotin .6s both}@keyframes shotin{from{transform:scale(1.6);opacity:0}to{transform:none;opacity:1}}
+.susp-ico{display:block;width:96px;height:96px;margin:10px auto 0;color:var(--pu);animation:pulse .8s ease-in-out infinite}.susp-ico svg{width:100%;height:100%}@keyframes pulse{50%{transform:scale(1.18)}}
+.dots i{display:inline-block;width:12px;height:12px;margin:0 5px;border-radius:50%;background:var(--pu);animation:dot 1s infinite}.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}@keyframes dot{50%{opacity:.2;transform:translateY(-6px)}}
+.cd{font-size:7rem;font-weight:900;line-height:1;color:var(--pu);text-shadow:0 0 30px var(--pu);animation:cdp .7s both}@keyframes cdp{from{transform:scale(1.9);opacity:0}to{transform:none;opacity:1}}
+.hl{font-weight:900;font-size:1.3rem;letter-spacing:.14em;color:var(--pu)}
+.impname{font-size:clamp(2.8rem,16vw,5.2rem);font-weight:900;text-transform:uppercase;line-height:1;margin:10px 0 4px;text-shadow:0 0 34px var(--pu);word-break:break-word}.amp{color:var(--pu)}
+.pop .impname{animation:impin .7s cubic-bezier(.2,1.4,.4,1) both}@keyframes impin{from{transform:scale(.3);opacity:0;filter:blur(8px)}to{transform:none;opacity:1;filter:none}}
+body[data-t=football] .pop .impname{animation:stad .8s both}@keyframes stad{from{transform:translateX(-110%) skewX(-12deg);opacity:0}to{transform:none;opacity:1}}
+body[data-t=ufc] .pop .impname{animation:ko .6s both}@keyframes ko{0%{transform:scale(2.4);opacity:0}40%{transform:scale(.95)}55%{transform:translateX(-8px)}70%{transform:translateX(6px)}100%{transform:none;opacity:1}}
+body[data-t=basketball] .pop .impname{animation:bnc .9s both}@keyframes bnc{0%{transform:translateY(-140%);opacity:0}50%{transform:none;opacity:1}65%{transform:translateY(-22px)}80%{transform:none}90%{transform:translateY(-6px)}100%{transform:none}}
+body[data-t=wwe] .pop .impname{animation:ent 1s both}@keyframes ent{from{letter-spacing:.5em;opacity:0;filter:blur(10px)}to{letter-spacing:0;opacity:1;filter:none}}
+.fx{position:fixed;inset:0;pointer-events:none;z-index:5;animation:flash .7s ease-out both}@keyframes flash{0%{background:color-mix(in srgb,var(--pu) 50%,transparent)}100%{background:transparent}}
+body[data-t=football] .fx{background:linear-gradient(100deg,transparent 30%,#ffffff55 50%,transparent 70%);animation:sweep 1s both}@keyframes sweep{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.shake{animation:shk .4s}@keyframes shk{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+body[data-t=ufc] .shake{animation:shk .4s}body:not([data-t=ufc]) .shake{animation:none}
+.win{text-align:center;margin:14px 0}.win h2{font-size:clamp(1.6rem,8vw,2.3rem);color:var(--pu)}.win.imp h2{color:var(--bad)}.pop.win,.win.pop{animation:rise .5s both}.pop.ath,.ath.pop{animation:rise .5s both}@keyframes rise{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.ath{padding:12px}.athname{font-size:1.4rem;font-weight:900;text-transform:uppercase;margin:2px 0}
+.vfx{position:fixed;inset:0;pointer-events:none;z-index:6;overflow:hidden;animation:vout .4s 1.5s forwards}@keyframes vout{to{opacity:0}}
+.v-fc i{position:absolute;top:-24px;width:9px;height:16px;animation:fall 1.9s linear both}@keyframes fall{to{transform:translateY(112vh) rotate(720deg)}}
+.v-uc b{position:absolute;left:50%;top:38%;width:70vmin;height:70vmin;margin:-35vmin 0 0 -35vmin;color:var(--pu);filter:drop-shadow(0 0 12px var(--pu));transform:scale(.1);opacity:0;animation:ring 1.4s ease-out both}.v-uc b:nth-child(2){animation-delay:.25s}.v-uc b:nth-child(3){animation-delay:.5s}@keyframes ring{0%{transform:scale(.1);opacity:1}100%{transform:scale(1.8);opacity:0}}
+.v-wc i{position:absolute;bottom:-6px;width:6px;height:6px;border-radius:50%;background:#facc15;box-shadow:0 0 10px #facc15;animation:spark 1.5s ease-out both}@keyframes spark{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--dx),-75vh);opacity:0}}
+.v-bc span{position:absolute;top:-50px;width:34px;height:34px;color:var(--pu);animation:bfall 1.8s cubic-bezier(.4,0,.6,1) both}.v-bc svg{width:100%;height:100%}@keyframes bfall{0%{transform:translateY(0)}55%{transform:translateY(88vh)}70%{transform:translateY(70vh)}85%{transform:translateY(88vh)}100%{transform:translateY(88vh)}}
+.v-fi{background:radial-gradient(circle,#0000004d,#000000b3);animation:vin .3s both,vout .4s 1.5s forwards}@keyframes vin{from{opacity:0}}
+.redcard{position:absolute;left:50%;top:34%;width:110px;height:160px;margin-left:-55px;background:#dc2626;border-radius:10px;box-shadow:0 0 60px #dc2626;transform:rotate(-8deg);animation:slam .7s cubic-bezier(.2,1.6,.4,1) both}@keyframes slam{from{transform:rotate(-8deg) scale(5);opacity:0}to{transform:rotate(-8deg) scale(1);opacity:1}}
+.v-ui{background:radial-gradient(circle at 50% 40%,transparent 30%,#7f1d1dcc);animation:vin .3s both,vout .4s 1.5s forwards}.v-ui svg{position:absolute;inset:0;width:100%;height:100%}.v-ui path{fill:none;stroke:#fff;stroke-width:.8;stroke-dasharray:1;stroke-dashoffset:1;filter:drop-shadow(0 0 3px #ef4444);animation:draw .7s ease-out forwards}.v-ui path:nth-child(n+2){animation-delay:.3s}@keyframes draw{to{stroke-dashoffset:0}}
+.v-wi{background:radial-gradient(circle at 50% 38%,transparent 60px,#000 300px);animation:lights 1.9s both}@keyframes lights{0%{opacity:0}8%{opacity:1}18%{opacity:.25}28%{opacity:1}42%{opacity:.35}55%,85%{opacity:1}100%{opacity:0}}
+.v-bi{background:#450a0acc;animation:redp .5s 3,vout .4s 1.5s forwards}@keyframes redp{50%{background:#7f1d1dcc}}.clock{position:absolute;left:0;right:0;top:30%;text-align:center;font:900 clamp(4rem,22vw,8rem) ui-monospace,monospace;color:#ef4444;text-shadow:0 0 30px #ef4444;animation:clk .5s steps(1) 3}@keyframes clk{50%{opacity:.25}}
+.win.imp h2{text-shadow:0 0 18px #ef4444;animation:flick 2.4s infinite steps(1)}@keyframes flick{0%,90%,100%{opacity:1}93%{opacity:.4}96%{opacity:.9}}
+.win.crew h2{text-shadow:0 0 22px var(--pu)}
+.bar .off{text-decoration:line-through;opacity:.55}
+body[data-t=f1]{--bg:#05080c;--card:#0d141c;--card2:#152330;--line:#1f4258;--pu:#22d3ee;--pu2:#0e7490;--mu:#9fc1d1;--on:#021014}
+body[data-t=f1]::before{background-image:repeating-linear-gradient(45deg,#ffffff08 0 3px,transparent 3px 7px),repeating-linear-gradient(-45deg,#00000050 0 3px,transparent 3px 7px),linear-gradient(100deg,transparent 40%,#22d3ee14 50%,transparent 60%)}
+body[data-t=f1]::after{content:"";position:fixed;left:0;right:0;top:0;height:14px;background:conic-gradient(#fff 25%,#111 0 50%,#fff 0 75%,#111 0) 0 0/28px 28px;z-index:3;pointer-events:none}
+body[data-t=f1] .card,body[data-t=f1] .banner,body[data-t=f1] .btn,body[data-t=f1] .chip{border-radius:2px;clip-path:polygon(14px 0,100% 0,calc(100% - 14px) 100%,0 100%)}
+body[data-t=f1] h2,body[data-t=f1] .big,body[data-t=f1] .impname{font-style:italic}
+.v-1c u{position:absolute;left:-30%;height:2px;width:40%;background:linear-gradient(90deg,transparent,#fff,#22d3ee);animation:zip .7s linear both}@keyframes zip{to{transform:translateX(330%)}}
+.v-1c .flag{position:absolute;left:0;right:0;top:42%;height:56px;background:conic-gradient(#fff 25%,#111 0 50%,#fff 0 75%,#111 0) 0 0/28px 28px;transform:translateX(-110%);animation:wave 1.2s .2s ease-out both}@keyframes wave{to{transform:translateX(0)}}
+.v-1i{background:radial-gradient(circle,#450a0acc,#000000e6);animation:vin .3s both,vout .4s 1.5s forwards}
+@media (prefers-reduced-motion:reduce){.vfx{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){#app,.floaters span{animation:none}}
+</style></head><body><div id="bg"></div><div id="app"></div>
+<script>
+// ===================== CONFIG =====================
+const APP_NAME="Sports Impostor";
+const SPORTS={football:{n:"Football",b:"FB",c:"#4ade80",d:"#16a34a"},ufc:{n:"UFC / MMA",b:"MMA",c:"#f43f5e",d:"#be123c"},wwe:{n:"WWE",b:"WWE",c:"#facc15",d:"#ca8a04"},basketball:{n:"Basketball",b:"NBA",c:"#fb923c",d:"#ea580c"}};
+const SV=b=>`<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${b}</svg>`;
+const ICON={football:SV('<circle cx="32" cy="32" r="26"/><path d="M32 20l11 8-4 13H25l-4-13z"/><path d="M32 20V7M43 28l13-4M39 41l8 11M25 41l-8 11M21 28L8 24"/>'),basketball:SV('<circle cx="32" cy="32" r="26"/><path d="M6 32h52M32 6v52"/><path d="M13 13c10 8 10 30 0 38M51 13c-10 8-10 30 0 38"/>'),ufc:SV('<path d="M20 30c0-10 6-18 18-18 10 0 16 7 16 16v10c0 8-5 12-12 12H28c-5 0-8-3-8-8z"/><path d="M22 50h30v8H22z"/><path d="M20 30c-6 0-9 5-6 9 2 3 6 3 8 2"/><path d="M38 24c5 0 9 3 9 8M32 38h14"/>'),wwe:SV('<rect x="2" y="24" width="60" height="16" rx="4"/><ellipse cx="32" cy="32" rx="14" ry="19"/><circle cx="32" cy="32" r="6"/><circle cx="10" cy="32" r="3"/><circle cx="54" cy="32" r="3"/>')};
+SPORTS.f1={n:"Formula 1",b:"F1",c:"#22d3ee",d:"#0e7490"};
+ICON.f1=SV('<path d="M10 10h44M32 10v14"/><path d="M26 24h12l3 22H23z"/><rect x="11" y="16" width="9" height="15" rx="2"/><rect x="44" y="16" width="9" height="15" rx="2"/><rect x="10" y="40" width="11" height="15" rx="2"/><rect x="43" y="40" width="11" height="15" rx="2"/><path d="M32 46v10M16 58h32"/>');
+// ===================== DATABASE (edit here) =====================
+// Format per line: Name|Difficulty(E/M/H)|Role|Nationality|Team/Promotion (optional)
+// A name appearing under several sports is merged into ONE record that belongs to all of them.
+const DATA={
+football:`Cristiano Ronaldo|E|Forward|POR|Man Utd, Real Madrid
+Lionel Messi|E|Forward|ARG|Barcelona, PSG, Inter Miami
+Kylian Mbappé|E|Forward|FRA|PSG, Real Madrid
+Neymar|E|Forward|BRA|Barcelona, PSG, Santos
+Erling Haaland|E|Striker|NOR|Man City
+Mohamed Salah|E|Winger|EGY|Liverpool
+David Beckham|E|Midfielder|ENG|Man Utd, Real Madrid
+Zinedine Zidane|E|Midfielder / Manager|FRA|Juventus, Real Madrid
+Ronaldinho|E|Attacker|BRA|Barcelona, Milan
+Thierry Henry|E|Forward|FRA|Arsenal
+Wayne Rooney|E|Forward|ENG|Man Utd
+Harry Kane|E|Striker|ENG|Spurs, Bayern
+Jude Bellingham|E|Midfielder|ENG|Dortmund, Real Madrid
+Lamine Yamal|M|Winger|ESP|Barcelona
+Didier Drogba|M|Striker|CIV|Chelsea
+Sir Alex Ferguson|E|Manager|SCO|Man Utd
+José Mourinho|E|Manager|POR|Chelsea, Real Madrid
+Pep Guardiola|E|Manager|ESP|Barcelona, Man City
+Roy Keane|E|Midfielder|IRL|Man Utd
+Zlatan Ibrahimović|E|Striker|SWE|Ajax, Milan, PSG
+Pelé|E|Forward|BRA|Santos, Brazil
+Diego Maradona|E|Attacker|ARG|Napoli, Argentina
+Johan Cruyff|E|Forward / Manager|NED|Ajax, Barcelona
+Ronaldo Nazário|E|Striker|BRA|Inter, Real Madrid
+Luka Modrić|E|Midfielder|CRO|Real Madrid
+Kevin De Bruyne|E|Midfielder|BEL|Man City
+Virgil van Dijk|E|Defender|NED|Liverpool
+Steven Gerrard|E|Midfielder|ENG|Liverpool
+Frank Lampard|E|Midfielder|ENG|Chelsea
+Paul Scholes|H|Midfielder|ENG|Man Utd
+Eric Cantona|E|Forward|FRA|Man Utd
+Arsène Wenger|E|Manager|FRA|Arsenal
+Jürgen Klopp|E|Manager|GER|Liverpool
+Carlo Ancelotti|E|Manager|ITA|Real Madrid, Milan
+Sergio Ramos|E|Defender|ESP|Real Madrid
+Gianluigi Buffon|E|Goalkeeper|ITA|Juventus
+Manuel Neuer|E|Goalkeeper|GER|Bayern
+Andrés Iniesta|E|Midfielder|ESP|Barcelona
+Xavi|E|Midfielder|ESP|Barcelona
+Luis Suárez|E|Striker|URU|Liverpool, Barcelona
+Robert Lewandowski|E|Striker|POL|Bayern, Barcelona
+Karim Benzema|E|Striker|FRA|Real Madrid
+Son Heung-min|E|Forward|KOR|Spurs
+Bukayo Saka|M|Winger|ENG|Arsenal
+Phil Foden|H|Midfielder|ENG|Man City
+Vinícius Júnior|E|Winger|BRA|Real Madrid
+Gareth Bale|E|Winger|WAL|Spurs, Real Madrid
+Cesc Fàbregas|H|Midfielder|ESP|Arsenal, Barcelona
+Peter Schmeichel|H|Goalkeeper|DEN|Man Utd
+Ian Wright|H|Striker|ENG|Arsenal
+Alan Shearer|M|Striker|ENG|Newcastle
+Rio Ferdinand|H|Defender|ENG|Man Utd
+Franz Beckenbauer|E|Defender|GER|Bayern
+Michel Platini|H|Midfielder|FRA|Juventus
+Marco van Basten|H|Striker|NED|Milan
+Ruud Gullit|H|Midfielder|NED|Milan, Chelsea
+Dennis Bergkamp|M|Forward|NED|Arsenal
+Paolo Maldini|E|Defender|ITA|Milan
+Roberto Baggio|M|Forward|ITA|Juventus, Milan
+Francesco Totti|E|Forward|ITA|Roma
+Andrea Pirlo|E|Midfielder|ITA|Juventus, Milan
+Alessandro Del Piero|H|Forward|ITA|Juventus
+Fabio Cannavaro|H|Defender|ITA|Juventus, Real Madrid
+Roberto Carlos|M|Defender|BRA|Real Madrid
+Cafu|M|Defender|BRA|Milan, Roma
+Kaká|E|Midfielder|BRA|Milan, Real Madrid
+Rivaldo|H|Attacker|BRA|Barcelona
+Romário|M|Striker|BRA|Barcelona
+Zico|H|Midfielder|BRA|Flamengo
+Garrincha|H|Winger|BRA|Botafogo
+Gabriel Batistuta|M|Striker|ARG|Fiorentina
+Juan Román Riquelme|H|Playmaker|ARG|Boca Juniors
+Ángel Di María|M|Winger|ARG|Real Madrid, Juventus
+Sergio Agüero|M|Striker|ARG|Man City
+Carlos Tevez|M|Striker|ARG|Man Utd, Man City
+Gonzalo Higuaín|H|Striker|ARG|Napoli, Juventus
+Paulo Dybala|M|Forward|ARG|Juventus, Roma
+Lautaro Martínez|H|Striker|ARG|Inter
+Julián Álvarez|H|Forward|ARG|Man City, Atlético
+Emiliano Martínez|H|Goalkeeper|ARG|Aston Villa
+Raúl|H|Striker|ESP|Real Madrid
+Fernando Torres|M|Striker|ESP|Liverpool, Chelsea
+David Villa|H|Striker|ESP|Barcelona
+Iker Casillas|M|Goalkeeper|ESP|Real Madrid
+Carles Puyol|H|Defender|ESP|Barcelona
+Gerard Piqué|M|Defender|ESP|Barcelona
+Sergio Busquets|H|Midfielder|ESP|Barcelona
+Rodri|M|Midfielder|ESP|Man City
+Pedri|M|Midfielder|ESP|Barcelona
+Gavi|H|Midfielder|ESP|Barcelona
+Xabi Alonso|M|Midfielder / Manager|ESP|Liverpool, Real Madrid
+David Silva|H|Playmaker|ESP|Man City
+Miroslav Klose|M|Striker|GER|Bayern
+Philipp Lahm|M|Defender|GER|Bayern
+Thomas Müller|M|Forward|GER|Bayern
+Toni Kroos|M|Midfielder|GER|Real Madrid
+Mesut Özil|M|Playmaker|GER|Arsenal, Real Madrid
+Bastian Schweinsteiger|H|Midfielder|GER|Bayern, Man Utd
+Oliver Kahn|M|Goalkeeper|GER|Bayern
+Lothar Matthäus|M|Midfielder|GER|Bayern, Inter
+Jamal Musiala|M|Midfielder|GER|Bayern
+Florian Wirtz|H|Midfielder|GER|Leverkusen
+Antoine Griezmann|E|Forward|FRA|Atlético
+Paul Pogba|E|Midfielder|FRA|Man Utd, Juventus
+N'Golo Kanté|M|Midfielder|FRA|Chelsea
+Patrick Vieira|M|Midfielder|FRA|Arsenal
+Lilian Thuram|H|Defender|FRA|Juventus
+Franck Ribéry|H|Winger|FRA|Bayern
+Hugo Lloris|H|Goalkeeper|FRA|Spurs
+Ousmane Dembélé|M|Winger|FRA|PSG, Barcelona
+Didier Deschamps|M|Manager|FRA
+Eden Hazard|M|Winger|BEL|Chelsea, Real Madrid
+Romelu Lukaku|M|Striker|BEL|Chelsea, Inter
+Thibaut Courtois|M|Goalkeeper|BEL|Real Madrid
+Luís Figo|M|Winger|POR|Barcelona, Real Madrid
+Eusébio|H|Striker|POR|Benfica
+Bruno Fernandes|M|Midfielder|POR|Man Utd
+Bernardo Silva|H|Midfielder|POR|Man City
+Samuel Eto'o|M|Striker|CMR|Barcelona, Inter
+Yaya Touré|M|Midfielder|CIV|Man City, Barcelona
+George Weah|M|Striker|LBR|Milan
+Sadio Mané|M|Winger|SEN|Liverpool, Bayern
+Riyad Mahrez|H|Winger|ALG|Leicester, Man City
+Achraf Hakimi|H|Defender|MAR|PSG
+Jay-Jay Okocha|H|Midfielder|NGA|Bolton, PSG
+Gary Neville|H|Defender|ENG|Man Utd
+Ashley Cole|H|Defender|ENG|Arsenal, Chelsea
+John Terry|M|Defender|ENG|Chelsea
+Jamie Vardy|M|Striker|ENG|Leicester
+Jack Grealish|M|Winger|ENG|Aston Villa, Man City
+Declan Rice|M|Midfielder|ENG|Arsenal
+Trent Alexander-Arnold|M|Defender|ENG|Liverpool, Real Madrid
+Marcus Rashford|E|Forward|ENG|Man Utd
+Cole Palmer|M|Attacker|ENG|Chelsea
+Raheem Sterling|H|Winger|ENG|Man City, Chelsea
+Gary Lineker|E|Striker|ENG|Barcelona, Spurs
+Bobby Moore|H|Defender|ENG|West Ham
+Bobby Charlton|M|Midfielder|ENG|Man Utd
+Paul Gascoigne|M|Midfielder|ENG|Spurs, Lazio
+Michael Owen|M|Striker|ENG|Liverpool, Real Madrid
+Ryan Giggs|M|Winger|WAL|Man Utd
+Robbie Fowler|H|Striker|ENG|Liverpool
+Kenny Dalglish|H|Forward / Manager|SCO|Liverpool
+Jamie Carragher|H|Defender|ENG|Liverpool
+Petr Čech|H|Goalkeeper|CZE|Chelsea, Arsenal
+Gareth Southgate|M|Manager|ENG
+Thomas Tuchel|M|Manager|GER|Chelsea, Bayern
+Antonio Conte|M|Manager|ITA|Juventus, Chelsea
+Mikel Arteta|M|Manager|ESP|Arsenal
+Diego Simeone|M|Manager|ARG|Atlético
+Brian Clough|M|Manager|ENG|Nottingham Forest
+Bill Shankly|H|Manager|SCO|Liverpool
+Claudio Ranieri|H|Manager|ITA|Leicester
+Harry Redknapp|H|Manager|ENG|West Ham, Spurs
+Robin van Persie|M|Striker|NED|Arsenal, Man Utd
+Arjen Robben|M|Winger|NED|Chelsea, Bayern
+Wesley Sneijder|H|Playmaker|NED|Inter
+Edwin van der Sar|H|Goalkeeper|NED|Man Utd
+Christian Eriksen|M|Midfielder|DEN|Spurs, Man Utd
+Martin Ødegaard|M|Midfielder|NOR|Arsenal
+Hristo Stoichkov|H|Forward|BUL|Barcelona
+Gheorghe Hagi|H|Playmaker|ROU|Galatasaray
+Davor Šuker|H|Striker|CRO|Real Madrid
+Alisson|M|Goalkeeper|BRA|Liverpool
+Thiago Silva|M|Defender|BRA|Chelsea, PSG
+Marcelo|M|Defender|BRA|Real Madrid
+Casemiro|M|Midfielder|BRA|Real Madrid, Man Utd
+Rodrygo|H|Forward|BRA|Real Madrid
+Christian Pulisic|M|Winger|USA|Chelsea, Milan
+Alphonso Davies|H|Defender|CAN|Bayern
+Alex Morgan|M|Striker|USA|US Women's Team
+Megan Rapinoe|M|Winger|USA|US Women's Team
+Marta|M|Forward|BRA|Brazil Women
+Alexia Putellas|H|Midfielder|ESP|Barcelona Femení
+Mia Hamm|H|Striker|USA|US Women's Team`,
+ufc:`Conor McGregor|E|Featherweight / Lightweight|IRL|UFC
+Khabib Nurmagomedov|E|Lightweight|RUS|UFC
+Jon Jones|E|Heavyweight|USA|UFC
+Alex Pereira|E|Light Heavyweight|BRA|UFC
+Islam Makhachev|E|Lightweight|RUS|UFC
+Charles Oliveira|E|Lightweight|BRA|UFC
+Israel Adesanya|E|Middleweight|NZL|UFC
+Dustin Poirier|E|Lightweight|USA|UFC
+Max Holloway|E|Featherweight|USA|UFC
+Sean O'Malley|E|Bantamweight|USA|UFC
+Nate Diaz|E|Welterweight|USA|UFC
+Anderson Silva|E|Middleweight|BRA|UFC
+Georges St-Pierre|E|Welterweight|CAN|UFC
+Ronda Rousey|E|Bantamweight|USA|UFC, WWE
+Brock Lesnar|E|Heavyweight|USA|UFC, WWE
+Daniel Cormier|E|Heavyweight|USA|UFC
+Tom Aspinall|E|Heavyweight|ENG|UFC
+Mike Tyson|E|Boxing crossover|USA|Boxing
+Chuck Liddell|E|Light Heavyweight|USA|UFC
+Randy Couture|E|Heavyweight|USA|UFC
+Ken Shamrock|H|Pioneer|USA|UFC
+Royce Gracie|E|Pioneer|BRA|UFC
+BJ Penn|M|Lightweight|USA|UFC
+José Aldo|M|Featherweight|BRA|UFC
+Cain Velasquez|M|Heavyweight|USA|UFC
+Stipe Miocic|M|Heavyweight|USA|UFC
+Francis Ngannou|E|Heavyweight|CMR|UFC, PFL
+Kamaru Usman|M|Welterweight|NGA|UFC
+Leon Edwards|M|Welterweight|ENG|UFC
+Jorge Masvidal|M|Welterweight|USA|UFC
+Michael Bisping|M|Middleweight|ENG|UFC
+Dana White|E|UFC President|USA|UFC
+Joe Rogan|E|Commentator|USA|UFC
+Amanda Nunes|E|Bantamweight|BRA|UFC
+Valentina Shevchenko|H|Flyweight|KGZ|UFC
+Holly Holm|M|Bantamweight|USA|UFC
+Paddy Pimblett|M|Lightweight|ENG|UFC
+Ilia Topuria|E|Featherweight|GEO|UFC
+Dricus du Plessis|H|Middleweight|RSA|UFC
+Alexander Volkanovski|E|Featherweight|AUS|UFC
+Justin Gaethje|M|Lightweight|USA|UFC
+Colby Covington|H|Welterweight|USA|UFC
+Robert Whittaker|H|Middleweight|AUS|UFC
+Frankie Edgar|H|Lightweight|USA|UFC
+Matt Hughes|H|Welterweight|USA|UFC
+Cris Cyborg|H|Featherweight|BRA|UFC
+Henry Cejudo|H|Flyweight|USA|UFC
+Tito Ortiz|H|Light Heavyweight|USA|UFC
+Chael Sonnen|H|Middleweight|USA|UFC
+Jiří Procházka|H|Light Heavyweight|CZE|UFC
+Bobby Lashley|E|Heavyweight|USA|UFC, WWE
+Shayna Baszler|H|Bantamweight|USA|UFC, WWE
+CM Punk|E|Wrestling crossover|USA|UFC, WWE
+Jake Paul|E|Boxing crossover|USA|Boxing
+Bruce Buffer|M|Ring announcer|USA|UFC
+Mark Coleman|H|Heavyweight|USA|UFC
+Dan Severn|H|Pioneer|USA|UFC
+Pat Miletich|H|Welterweight|USA|UFC
+Quinton "Rampage" Jackson|M|Light Heavyweight|USA|UFC, Pride
+Forrest Griffin|M|Light Heavyweight|USA|UFC
+Rashad Evans|H|Light Heavyweight|USA|UFC
+Wanderlei Silva|M|Middleweight|BRA|Pride, UFC
+Mauricio "Shogun" Rua|M|Light Heavyweight|BRA|Pride, UFC
+Vitor Belfort|M|Middleweight|BRA|UFC
+Dan Henderson|M|Middleweight|USA|Pride, UFC
+Rich Franklin|H|Middleweight|USA|UFC
+Mirko Cro Cop|M|Heavyweight|CRO|Pride, UFC
+Fedor Emelianenko|M|Heavyweight|RUS|Pride, Bellator
+Nick Diaz|M|Welterweight|USA|UFC, Strikeforce
+Robbie Lawler|M|Welterweight|USA|UFC
+Tyron Woodley|M|Welterweight|USA|UFC
+Rafael dos Anjos|H|Lightweight|BRA|UFC
+Gilbert Burns|H|Welterweight|BRA|UFC
+Belal Muhammad|M|Welterweight|USA|UFC
+Shavkat Rakhmonov|M|Welterweight|KAZ|UFC
+Khamzat Chimaev|E|Middleweight|SWE|UFC
+Sean Strickland|M|Middleweight|USA|UFC
+Paulo Costa|M|Middleweight|BRA|UFC
+Jan Błachowicz|H|Light Heavyweight|POL|UFC
+Glover Teixeira|H|Light Heavyweight|BRA|UFC
+Jamahal Hill|H|Light Heavyweight|USA|UFC
+Magomed Ankalaev|H|Light Heavyweight|RUS|UFC
+Alexandre Pantoja|H|Flyweight|BRA|UFC
+Brandon Moreno|M|Flyweight|MEX|UFC
+Petr Yan|M|Bantamweight|RUS|UFC
+Aljamain Sterling|M|Bantamweight|USA|UFC
+Merab Dvalishvili|M|Bantamweight|GEO|UFC
+Zhang Weili|M|Strawweight|CHN|UFC
+Joanna Jędrzejczyk|M|Strawweight|POL|UFC
+Rose Namajunas|M|Strawweight|USA|UFC
+Miesha Tate|M|Bantamweight|USA|UFC
+Demetrious Johnson|M|Flyweight|USA|UFC, ONE
+Dominick Cruz|H|Bantamweight|USA|UFC
+Urijah Faber|H|Featherweight|USA|WEC, UFC
+Michael Chandler|M|Lightweight|USA|Bellator, UFC
+Derrick Lewis|M|Heavyweight|USA|UFC
+Ciryl Gane|M|Heavyweight|FRA|UFC
+Curtis Blaydes|H|Heavyweight|USA|UFC
+Tony Ferguson|M|Lightweight|USA|UFC
+Jared Cannonier|H|Middleweight|USA|UFC
+Arman Tsarukyan|H|Lightweight|ARM|UFC`,
+wwe:`The Undertaker|E|Deadman|USA|WWE
+John Cena|E|Never Give Up|USA|WWE
+Dwayne "The Rock" Johnson|E|Great One|USA|WWE
+Stone Cold Steve Austin|E|Texas Rattlesnake|USA|WWE
+Roman Reigns|E|Tribal Chief|USA|WWE
+Cody Rhodes|E|American Nightmare|USA|WWE
+Randy Orton|E|Viper|USA|WWE
+Triple H|E|Game|USA|WWE
+Shawn Michaels|E|Heartbreak Kid|USA|WWE
+Hulk Hogan|E|Hulkamania|USA|WWF, WCW
+Brock Lesnar|E|Beast Incarnate|USA|WWE, UFC
+CM Punk|E|Best in the World|USA|WWE, AEW
+Rey Mysterio|E|Masked high-flyer|USA|WWE
+Batista|E|Animal|USA|WWE
+Kane|E|Big Red Machine|USA|WWE
+Seth Rollins|E|Architect|USA|WWE
+Jey Uso|E|Yeet Master|USA|WWE
+Rhea Ripley|E|Mami|AUS|WWE
+Becky Lynch|E|The Man|IRL|WWE
+Charlotte Flair|E|Queen|USA|WWE
+Ric Flair|E|Nature Boy|USA|WWE, WCW
+Randy Savage|E|Macho Man|USA|WWF, WCW
+André the Giant|E|Giant|FRA|WWF
+Bret Hart|E|Hitman|CAN|WWF
+Edge|E|Rated-R Superstar|CAN|WWE
+Chris Jericho|E|Y2J|CAN|WWE, AEW
+Kurt Angle|E|Olympic hero|USA|WWE
+Eddie Guerrero|E|Latino Heat|USA|WWE
+Big Show|E|World's Largest Athlete|USA|WWE
+Mick Foley|E|Mankind / Cactus Jack|USA|WWE
+Goldberg|E|Streak|USA|WCW, WWE
+Sting|E|Icon|USA|WCW, AEW
+Sami Zayn|M|Underdog|CAN|WWE
+Kevin Owens|M|Prizefighter|CAN|WWE
+Drew McIntyre|M|Scottish Warrior|SCO|WWE
+Bianca Belair|M|EST|USA|WWE
+Mercedes Moné|H|Boss|USA|WWE, NJPW
+Trish Stratus|E|Women's pioneer|CAN|WWE
+Lita|H|Women's pioneer|USA|WWE
+AJ Styles|E|Phenomenal One|USA|WWE
+Bray Wyatt|E|Fiend|USA|WWE
+Dean Ambrose|H|Lunatic Fringe|USA|WWE, AEW
+Roddy Piper|E|Rowdy|CAN|WWF
+Ultimate Warrior|E|Warrior|USA|WWF
+Vince McMahon|E|Chairman|USA|WWE
+Paul Heyman|M|Advocate|USA|WWE
+Gunther|H|Ring General|AUT|WWE
+Logan Paul|E|Crossover star|USA|WWE
+Sheamus|H|Celtic Warrior|IRL|WWE
+Rob Van Dam|H|Mr. Monday Night|USA|WWE, ECW
+Booker T|H|Five-time champ|USA|WCW, WWE
+Jimmy Uso|H|Tag team star|USA|WWE
+Dominik Mysterio|H|Judgment Day|USA|WWE
+Mike Tyson|E|Boxing crossover|USA|WWE
+Bobby Lashley|E|Modern Era|USA|WWE, UFC
+Shayna Baszler|H|Modern Era|USA|WWE, UFC
+Ken Shamrock|H|Attitude Era|USA|WWF, UFC
+Ronda Rousey|E|Modern Era|USA|WWE, UFC
+Jake "The Snake" Roberts|M|Golden Era|USA|WWF
+Ted DiBiase|M|Golden Era|USA|WWF
+Jimmy Snuka|H|Golden Era|FIJ|WWF
+Bruno Sammartino|M|Golden Era|ITA|WWWF
+Ricky Steamboat|H|Golden Era|USA|WWF, WCW
+Hacksaw Jim Duggan|H|Golden Era|USA|WWF, WCW
+Mr. Perfect|H|Golden Era|USA|WWF
+Razor Ramon|M|Attitude Era|USA|WWF, WCW
+Diesel|M|Attitude Era|USA|WWF, WCW
+X-Pac|H|Attitude Era|USA|WWF, WCW
+British Bulldog|H|Golden Era|ENG|WWF
+Owen Hart|M|Attitude Era|CAN|WWF
+Yokozuna|H|Golden Era|USA|WWF
+Lex Luger|H|Golden Era|USA|WWF, WCW
+Rick Rude|H|Golden Era|USA|WWF, WCW
+Dusty Rhodes|M|Golden Era|USA|WWF, WCW
+Terry Funk|H|Hardcore Era|USA|WWF, ECW
+Harley Race|H|Golden Era|USA|WWF, NWA
+Jim Ross|M|Attitude Era|USA|WWE
+Jerry Lawler|M|Attitude Era|USA|WWE
+Bobby Heenan|M|Golden Era|USA|WWF, WCW
+Road Dogg|H|Attitude Era|USA|WWF
+Billy Gunn|H|Attitude Era|USA|WWF
+Mark Henry|M|Attitude Era|USA|WWE
+Rikishi|H|Attitude Era|USA|WWF
+Chyna|M|Attitude Era|USA|WWF
+Stacy Keibler|H|Ruthless Aggression|USA|WCW, WWE
+Torrie Wilson|H|Ruthless Aggression|USA|WWE
+Sable|H|Attitude Era|USA|WWF
+Miss Elizabeth|M|Golden Era|USA|WWF, WCW
+Molly Holly|H|Ruthless Aggression|USA|WWE
+Madusa|H|Golden Era|USA|WWF, WCW
+Beth Phoenix|M|Ruthless Aggression|CAN|WWE
+Natalya|M|Modern Era|CAN|WWE
+Alexa Bliss|M|Modern Era|USA|WWE
+Asuka|M|Modern Era|JPN|WWE
+Bayley|M|Modern Era|USA|WWE
+Liv Morgan|M|Modern Era|USA|WWE
+Naomi|H|Modern Era|USA|WWE
+Nikki Bella|M|Modern Era|USA|WWE
+Brie Bella|M|Modern Era|USA|WWE
+Paige|M|Modern Era|ENG|WWE
+Mickie James|M|Ruthless Aggression|USA|WWE, TNA
+Stephanie McMahon|E|Attitude Era|USA|WWE
+Shane McMahon|M|Attitude Era|USA|WWE
+The Miz|E|Modern Era|USA|WWE
+JBL|M|Ruthless Aggression|USA|WWE
+Jeff Hardy|M|Ruthless Aggression|USA|WWE, TNA
+Matt Hardy|M|Ruthless Aggression|USA|WWE, AEW
+Christian|M|Attitude Era|CAN|WWE
+Bubba Ray Dudley|H|Attitude Era|USA|ECW, WWE
+D-Von Dudley|H|Attitude Era|USA|ECW, WWE
+Tazz|H|Hardcore Era|USA|ECW, WWE
+Umaga|H|Ruthless Aggression|USA|WWE
+The Great Khali|M|Ruthless Aggression|IND|WWE
+Carlito|H|Ruthless Aggression|PUR|WWE
+Kofi Kingston|M|Modern Era|GHA|WWE
+Big E|M|Modern Era|USA|WWE
+Xavier Woods|M|Modern Era|USA|WWE
+Daniel Bryan|E|Modern Era|USA|WWE, AEW
+Wade Barrett|H|Modern Era|ENG|WWE
+Braun Strowman|M|Modern Era|USA|WWE
+Brodie Lee|M|Modern Era|USA|WWE, AEW
+Finn Bálor|M|Modern Era|IRL|WWE, NJPW
+Karrion Kross|H|Modern Era|USA|WWE
+Damian Priest|M|Modern Era|USA|WWE
+Solo Sikoa|H|Modern Era|USA|WWE
+Tama Tonga|H|Modern Era|TGA|NJPW, WWE
+Ricochet|H|Modern Era|USA|WWE
+LA Knight|M|Modern Era|USA|WWE
+Austin Theory|H|Modern Era|USA|WWE
+Bron Breakker|H|Modern Era|USA|WWE
+Jacob Fatu|M|Modern Era|USA|WWE
+Nia Jax|M|Modern Era|USA|WWE
+Chelsea Green|H|Modern Era|CAN|WWE
+Jade Cargill|H|Modern Era|USA|AEW, WWE
+Tiffany Stratton|H|Modern Era|USA|WWE
+Tommaso Ciampa|H|Modern Era|ITA|WWE
+Sgt. Slaughter|H|Golden Era|USA|WWF
+The Iron Sheik|M|Golden Era|IRN|WWF
+Nikolai Volkoff|H|Golden Era|RUS|WWF
+King Kong Bundy|H|Golden Era|USA|WWF
+Bam Bam Bigelow|H|Golden Era|USA|WWF
+Vader|M|Attitude Era|USA|WCW, WWF
+Sid Vicious|M|Attitude Era|USA|WCW, WWF
+Goldust|M|Attitude Era|USA|WWF
+Chavo Guerrero|H|Ruthless Aggression|USA|WWE
+Andrade|H|Modern Era|MEX|WWE, AEW
+Grayson Waller|H|Modern Era|AUS|WWE
+Ahmed Johnson|H|Attitude Era|USA|WWF`,
+basketball:`Michael Jordan|E|Guard|USA|Bulls
+LeBron James|E|Forward|USA|Cavaliers, Heat, Lakers
+Kobe Bryant|E|Guard|USA|Lakers
+Stephen Curry|E|Guard|USA|Warriors
+Shaquille O'Neal|E|Center|USA|Lakers, Heat
+Kevin Durant|E|Forward|USA|Thunder, Warriors, Nets
+Giannis Antetokounmpo|E|Forward|GRE|Bucks
+Luka Dončić|E|Guard|SVN|Mavericks, Lakers
+Nikola Jokić|E|Center|SRB|Nuggets
+Allen Iverson|E|Guard|USA|76ers
+Magic Johnson|E|Guard|USA|Lakers
+Larry Bird|E|Forward|USA|Celtics
+Tim Duncan|E|Forward / Center|USA|Spurs
+Dennis Rodman|E|Forward|USA|Bulls, Pistons
+Kyrie Irving|E|Guard|USA|Cavaliers, Nets, Mavericks
+James Harden|E|Guard|USA|Rockets, Clippers
+Anthony Edwards|E|Guard|USA|Timberwolves
+Victor Wembanyama|E|Center|FRA|Spurs
+Charles Barkley|E|Forward / Analyst|USA|Suns, 76ers
+Draymond Green|E|Forward|USA|Warriors
+Kareem Abdul-Jabbar|E|Center|USA|Bucks, Lakers
+Wilt Chamberlain|E|Center|USA|76ers, Lakers
+Bill Russell|E|Center|USA|Celtics
+Hakeem Olajuwon|E|Center|NGA|Rockets
+Dirk Nowitzki|E|Forward|GER|Mavericks
+Kevin Garnett|E|Forward|USA|Timberwolves, Celtics
+Dwyane Wade|E|Guard|USA|Heat
+Chris Paul|E|Guard|USA|Hornets, Clippers, Suns
+Carmelo Anthony|E|Forward|USA|Nuggets, Knicks
+Steve Nash|E|Guard|CAN|Suns
+Scottie Pippen|E|Forward|USA|Bulls
+Patrick Ewing|H|Center|JAM|Knicks
+Karl Malone|H|Forward|USA|Jazz
+John Stockton|H|Guard|USA|Jazz
+Yao Ming|E|Center|CHN|Rockets
+Vince Carter|E|Guard / Forward|USA|Raptors
+Tracy McGrady|H|Guard / Forward|USA|Magic, Rockets
+Paul Pierce|H|Forward|USA|Celtics
+Ray Allen|H|Guard|USA|Bucks, Celtics, Heat
+Russell Westbrook|E|Guard|USA|Thunder, Lakers
+Damian Lillard|E|Guard|USA|Trail Blazers, Bucks
+Jayson Tatum|E|Forward|USA|Celtics
+Ja Morant|E|Guard|USA|Grizzlies
+Devin Booker|E|Guard|USA|Suns
+Joel Embiid|E|Center|CMR|76ers
+Kawhi Leonard|E|Forward|USA|Spurs, Raptors, Clippers
+Zion Williamson|E|Forward|USA|Pelicans
+Paul George|H|Forward|USA|Pacers, Clippers
+Klay Thompson|H|Guard|USA|Warriors
+Shai Gilgeous-Alexander|M|Guard|CAN|Thunder
+Dominique Wilkins|H|Forward|FRA|Hawks
+Isiah Thomas|H|Guard|USA|Pistons
+Derrick Rose|H|Guard|USA|Bulls, Knicks
+Tony Parker|H|Guard|FRA|Spurs
+Manu Ginóbili|H|Guard|ARG|Spurs
+Gregg Popovich|H|Coach|USA|Spurs
+Phil Jackson|M|Coach|USA|Bulls, Lakers
+Jerry West|M|Guard|USA|Lakers
+Oscar Robertson|M|Guard|USA|Bucks, Royals
+Elgin Baylor|H|Forward|USA|Lakers
+Bob Cousy|H|Guard|USA|Celtics
+John Havlicek|H|Forward|USA|Celtics
+Julius Erving|E|Forward|USA|76ers
+Moses Malone|H|Center|USA|Rockets, 76ers
+Pete Maravich|M|Guard|USA|Hawks, Jazz
+George Gervin|H|Guard|USA|Spurs
+Walt Frazier|H|Guard|USA|Knicks
+Kevin McHale|H|Forward|USA|Celtics
+Robert Parish|H|Center|USA|Celtics
+James Worthy|H|Forward|USA|Lakers
+Clyde Drexler|M|Guard|USA|Trail Blazers, Rockets
+Gary Payton|M|Guard|USA|SuperSonics
+Reggie Miller|M|Guard|USA|Pacers
+Alonzo Mourning|H|Center|USA|Heat
+Penny Hardaway|M|Guard|USA|Magic
+Grant Hill|M|Forward|USA|Pistons, Magic
+Chris Webber|H|Forward|USA|Kings
+Jason Kidd|M|Guard|USA|Nets, Mavericks
+Vlade Divac|H|Center|SRB|Lakers, Kings
+Toni Kukoč|H|Forward|CRO|Bulls
+Shawn Kemp|M|Forward|USA|SuperSonics
+Charles Oakley|H|Forward|USA|Knicks
+Horace Grant|H|Forward|USA|Bulls
+Steve Kerr|M|Guard / Coach|USA|Bulls, Warriors
+Ben Wallace|H|Center|USA|Pistons
+Chauncey Billups|H|Guard|USA|Pistons
+Rasheed Wallace|H|Forward|USA|Pistons
+Rajon Rondo|H|Guard|USA|Celtics
+Metta World Peace|M|Forward|USA|Lakers
+Lamar Odom|H|Forward|USA|Lakers
+Pau Gasol|M|Forward|ESP|Lakers, Grizzlies
+Marc Gasol|H|Center|ESP|Grizzlies, Raptors
+Amar'e Stoudemire|H|Forward|USA|Suns, Knicks
+Gilbert Arenas|H|Guard|USA|Wizards
+Jimmy Butler|E|Forward|USA|Heat, Bulls
+Bam Adebayo|H|Center|USA|Heat
+Tyler Herro|H|Guard|USA|Heat
+Jalen Brunson|M|Guard|USA|Knicks
+Donovan Mitchell|E|Guard|USA|Jazz, Cavaliers
+Trae Young|E|Guard|USA|Hawks
+DeMar DeRozan|M|Guard|CAN|Raptors, Bulls
+Karl-Anthony Towns|M|Center|DOM|Timberwolves, Knicks
+Anthony Davis|E|Forward / Center|USA|Pelicans, Lakers
+Chris Bosh|M|Forward|USA|Raptors, Heat
+Blake Griffin|M|Forward|USA|Clippers
+Dwight Howard|E|Center|USA|Magic, Lakers
+Kevin Love|M|Forward|USA|Cavaliers
+LaMelo Ball|M|Guard|USA|Hornets
+Lonzo Ball|H|Guard|USA|Lakers, Bulls
+Paolo Banchero|H|Forward|USA|Magic
+Chet Holmgren|H|Center|USA|Thunder
+Scottie Barnes|H|Forward|CAN|Raptors
+Cade Cunningham|H|Guard|USA|Pistons
+Evan Mobley|H|Forward|USA|Cavaliers
+Jaylen Brown|M|Guard|USA|Celtics
+Rudy Gobert|M|Center|FRA|Jazz, Timberwolves
+Kristaps Porziņģis|M|Center|LAT|Knicks, Celtics
+Bronny James|M|Guard|USA|Lakers
+Jeremy Lin|M|Guard|USA|Knicks
+Mugsy Bogues|H|Guard|USA|Hornets
+Spud Webb|H|Guard|USA|Hawks
+Manute Bol|H|Center|SSD|Bullets
+Bill Walton|M|Center|USA|Trail Blazers, Celtics
+David Robinson|M|Center|USA|Spurs
+Larry Johnson|H|Forward|USA|Hornets
+Danny Ainge|H|Guard|USA|Celtics
+Pat Riley|M|Coach|USA|Lakers, Heat
+Red Auerbach|M|Coach|USA|Celtics
+Erik Spoelstra|H|Coach|USA|Heat
+Kenny Smith|H|Analyst|USA|Rockets
+Ernie Johnson|M|Broadcaster|USA|TNT
+Stephen Jackson|H|Guard|USA|Pacers, Warriors
+DeAndre Ayton|H|Center|BAH|Suns
+Khris Middleton|H|Forward|USA|Bucks
+Jrue Holiday|H|Guard|USA|Bucks, Celtics
+Ben Simmons|H|Guard|AUS|76ers, Nets
+Joe Johnson|H|Guard|USA|Hawks
+John Wall|H|Guard|USA|Wizards
+DeMarcus Cousins|H|Center|USA|Kings, Warriors
+Dillon Brooks|H|Forward|CAN|Grizzlies, Rockets`,
+f1:`Lewis Hamilton|E|Driver|ENG|Mercedes, Ferrari
+Michael Schumacher|E|Driver|GER|Ferrari, Benetton
+Max Verstappen|E|Driver|NED|Red Bull
+Ayrton Senna|E|Driver|BRA|McLaren, Lotus
+Sebastian Vettel|E|Driver|GER|Red Bull, Ferrari
+Fernando Alonso|E|Driver|ESP|Renault, Ferrari, Aston Martin
+Charles Leclerc|E|Driver|MON|Ferrari
+Lando Norris|E|Driver|ENG|McLaren
+Kimi Räikkönen|E|Driver|FIN|Ferrari, McLaren
+Alain Prost|E|Driver|FRA|McLaren, Ferrari
+Niki Lauda|E|Driver|AUT|Ferrari, McLaren
+Daniel Ricciardo|E|Driver|AUS|Red Bull, McLaren
+Oscar Piastri|E|Driver|AUS|McLaren
+Christian Horner|E|Team principal|ENG|Red Bull
+Nico Rosberg|M|Driver|GER|Mercedes
+Jenson Button|M|Driver|ENG|McLaren, Brawn
+Damon Hill|M|Driver|ENG|Williams
+Nigel Mansell|M|Driver|ENG|Williams, Ferrari
+Jackie Stewart|M|Driver|SCO|Tyrrell
+James Hunt|M|Driver|ENG|McLaren
+Mika Häkkinen|M|Driver|FIN|McLaren
+Juan Pablo Montoya|M|Driver|COL|Williams, McLaren
+Sergio Pérez|M|Driver|MEX|Red Bull
+Carlos Sainz|M|Driver|ESP|Ferrari, Williams
+George Russell|M|Driver|ENG|Mercedes
+Valtteri Bottas|M|Driver|FIN|Mercedes
+Mark Webber|M|Driver|AUS|Red Bull
+Felipe Massa|M|Driver|BRA|Ferrari
+Rubens Barrichello|M|Driver|BRA|Ferrari, Brawn
+David Coulthard|M|Driver|SCO|McLaren, Red Bull
+Jacques Villeneuve|M|Driver|CAN|Williams
+Juan Manuel Fangio|M|Driver|ARG|Mercedes, Ferrari
+Stirling Moss|M|Driver|ENG|Mercedes, Vanwall
+Jim Clark|M|Driver|SCO|Lotus
+Emerson Fittipaldi|M|Driver|BRA|Lotus, McLaren
+Mario Andretti|M|Driver|USA|Lotus, Ferrari
+Nelson Piquet|M|Driver|BRA|Brabham, Williams
+Toto Wolff|M|Team principal|AUT|Mercedes
+Adrian Newey|M|Designer|ENG|Red Bull, McLaren
+Bernie Ecclestone|M|Boss|ENG|Formula One Group
+Guenther Steiner|M|Team principal|ITA|Haas
+Martin Brundle|H|Commentator|ENG|Sky Sports
+David Croft|H|Commentator|ENG|Sky Sports
+Pierre Gasly|H|Driver|FRA|Alpine, AlphaTauri
+Esteban Ocon|H|Driver|FRA|Alpine
+Alex Albon|H|Driver|THA|Williams
+Yuki Tsunoda|H|Driver|JPN|AlphaTauri
+Lance Stroll|H|Driver|CAN|Aston Martin
+Nico Hülkenberg|H|Driver|GER|Renault, Haas
+Kevin Magnussen|H|Driver|DEN|Haas
+Romain Grosjean|H|Driver|FRA|Haas, Lotus
+Zhou Guanyu|H|Driver|CHN|Alfa Romeo
+Jean Alesi|H|Driver|FRA|Ferrari
+Gerhard Berger|H|Driver|AUT|Ferrari, McLaren
+Eddie Irvine|H|Driver|IRL|Ferrari, Jaguar
+Ralf Schumacher|H|Driver|GER|Williams
+Mick Schumacher|H|Driver|GER|Haas
+Kamui Kobayashi|H|Driver|JPN|Sauber
+Jack Brabham|H|Driver|AUS|Brabham
+Graham Hill|H|Driver|ENG|BRM, Lotus
+Gilles Villeneuve|H|Driver|CAN|Ferrari
+Ross Brawn|H|Team principal|ENG|Ferrari, Brawn
+Flavio Briatore|H|Team principal|ITA|Benetton, Renault
+Eddie Jordan|H|Team principal|IRL|Jordan
+Zak Brown|H|Team principal|USA|McLaren
+Andrea Kimi Antonelli|H|Driver|ITA|Mercedes
+Oliver Bearman|H|Driver|ENG|Ferrari, Haas
+Liam Lawson|H|Driver|NZL|Red Bull
+Franco Colapinto|H|Driver|ARG|Williams`
+};
+//LOGIC
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function buildDB(){const m=new Map();for(const s in DATA)DATA[s].trim().split('\n').forEach(l=>{const[name,d,role,nat,team]=l.split('|');const id=name.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g,'');let p=m.get(id);if(!p){p={id,name,diff:d,sports:[],roles:{},nat,team:team||''};m.set(id,p)}if(!p.sports.includes(s)){p.sports.push(s);p.roles[s]=role}});return[...m.values()]}
+const DB=buildDB();
+const ERA={L:`Pelé|Diego Maradona|Johan Cruyff|Franz Beckenbauer|Michel Platini|Marco van Basten|Ruud Gullit|Eusébio|Garrincha|Zico|Bobby Moore|Bobby Charlton|Brian Clough|Bill Shankly|Kenny Dalglish|Sir Alex Ferguson|Gabriel Batistuta|Romário|Roberto Baggio|Paolo Maldini|Lothar Matthäus|Oliver Kahn|Peter Schmeichel|Eric Cantona|Dennis Bergkamp|Ian Wright|Alan Shearer|Paul Gascoigne|Gary Lineker|Hristo Stoichkov|Gheorghe Hagi|Davor Šuker|George Weah|Jay-Jay Okocha|Rivaldo|Ronaldo Nazário|Zinedine Zidane|Royce Gracie|Ken Shamrock|Dan Severn|Mark Coleman|Pat Miletich|Randy Couture|Chuck Liddell|Tito Ortiz|Matt Hughes|BJ Penn|Wanderlei Silva|Mauricio "Shogun" Rua|Quinton "Rampage" Jackson|Vitor Belfort|Dan Henderson|Mirko Cro Cop|Fedor Emelianenko|Mike Tyson|Rich Franklin|Anderson Silva|Hulk Hogan|André the Giant|Randy Savage|Bruno Sammartino|Ric Flair|Roddy Piper|Ultimate Warrior|Jimmy Snuka|Ricky Steamboat|Hacksaw Jim Duggan|Mr. Perfect|Jake "The Snake" Roberts|Ted DiBiase|Dusty Rhodes|Harley Race|Terry Funk|Sgt. Slaughter|The Iron Sheik|Nikolai Volkoff|King Kong Bundy|Bam Bam Bigelow|Bobby Heenan|British Bulldog|Yokozuna|Lex Luger|Rick Rude|Miss Elizabeth|Madusa|Bret Hart|Owen Hart|Razor Ramon|Diesel|Vader|Sid Vicious|Goldberg|Sting|Stone Cold Steve Austin|The Undertaker|Shawn Michaels|Mick Foley|Chyna|Sable|Michael Jordan|Magic Johnson|Larry Bird|Kareem Abdul-Jabbar|Wilt Chamberlain|Bill Russell|Hakeem Olajuwon|Isiah Thomas|Dominique Wilkins|Julius Erving|Jerry West|Oscar Robertson|Elgin Baylor|Bob Cousy|John Havlicek|Moses Malone|Pete Maravich|George Gervin|Walt Frazier|Kevin McHale|Robert Parish|James Worthy|Clyde Drexler|Patrick Ewing|Karl Malone|John Stockton|Charles Barkley|Dennis Rodman|Scottie Pippen|Alonzo Mourning|Mugsy Bogues|Spud Webb|Manute Bol|Bill Walton|David Robinson|Larry Johnson|Danny Ainge|Pat Riley|Red Auerbach|Phil Jackson|Charles Oakley|Horace Grant|Shawn Kemp|Gary Payton|Reggie Miller|Penny Hardaway|Toni Kukoč|Vlade Divac|Ayrton Senna|Alain Prost|Niki Lauda|Nigel Mansell|Jackie Stewart|James Hunt|Juan Manuel Fangio|Stirling Moss|Jim Clark|Emerson Fittipaldi|Mario Andretti|Nelson Piquet|Jack Brabham|Graham Hill|Gilles Villeneuve|Jean Alesi|Gerhard Berger|Bernie Ecclestone|Eddie Jordan|Flavio Briatore|Eddie Irvine|Damon Hill`,
+C:`Cristiano Ronaldo|Lionel Messi|Kylian Mbappé|Neymar|Erling Haaland|Mohamed Salah|Jude Bellingham|Lamine Yamal|Harry Kane|Vinícius Júnior|Bukayo Saka|Phil Foden|Rodri|Pedri|Gavi|Jamal Musiala|Florian Wirtz|Cole Palmer|Declan Rice|Trent Alexander-Arnold|Marcus Rashford|Virgil van Dijk|Kevin De Bruyne|Son Heung-min|Lautaro Martínez|Julián Álvarez|Emiliano Martínez|Rodrygo|Alisson|Bruno Fernandes|Bernardo Silva|Martin Ødegaard|Achraf Hakimi|Alphonso Davies|Ousmane Dembélé|Christian Pulisic|Luka Modrić|Robert Lewandowski|Pep Guardiola|Mikel Arteta|Thomas Tuchel|Diego Simeone|Carlo Ancelotti|Jack Grealish|Antoine Griezmann|Casemiro|Jamie Vardy|Karim Benzema|Islam Makhachev|Alex Pereira|Ilia Topuria|Tom Aspinall|Sean O'Malley|Khamzat Chimaev|Shavkat Rakhmonov|Dricus du Plessis|Alexander Volkanovski|Max Holloway|Charles Oliveira|Merab Dvalishvili|Belal Muhammad|Leon Edwards|Paddy Pimblett|Arman Tsarukyan|Magomed Ankalaev|Jamahal Hill|Alexandre Pantoja|Zhang Weili|Jon Jones|Jake Paul|Sean Strickland|Paulo Costa|Ciryl Gane|Joe Rogan|Dana White|Bruce Buffer|Justin Gaethje|Michael Chandler|Israel Adesanya|Kamaru Usman|Francis Ngannou|Jiří Procházka|Jan Błachowicz|Curtis Blaydes|Derrick Lewis|Brandon Moreno|Petr Yan|Aljamain Sterling|Dustin Poirier|Conor McGregor|Bobby Lashley|Shayna Baszler|Roman Reigns|Cody Rhodes|Seth Rollins|Rhea Ripley|Jey Uso|Jimmy Uso|Bianca Belair|Gunther|Logan Paul|LA Knight|Jacob Fatu|Solo Sikoa|Tama Tonga|Bron Breakker|Damian Priest|Finn Bálor|Liv Morgan|Tiffany Stratton|Jade Cargill|Chelsea Green|Nia Jax|Dominik Mysterio|Sami Zayn|Kevin Owens|Drew McIntyre|Karrion Kross|Austin Theory|Grayson Waller|Ricochet|Andrade|Alexa Bliss|Asuka|Bayley|Charlotte Flair|Becky Lynch|Mercedes Moné|Naomi|Tommaso Ciampa|Braun Strowman|Randy Orton|John Cena|CM Punk|The Miz|Paul Heyman|Rey Mysterio|AJ Styles|Kofi Kingston|Big E|Xavier Woods|LeBron James|Stephen Curry|Kevin Durant|Giannis Antetokounmpo|Luka Dončić|Nikola Jokić|Joel Embiid|Jayson Tatum|Anthony Edwards|Victor Wembanyama|Shai Gilgeous-Alexander|Jalen Brunson|Donovan Mitchell|Trae Young|Ja Morant|Devin Booker|Zion Williamson|Cade Cunningham|Paolo Banchero|Chet Holmgren|Scottie Barnes|Evan Mobley|LaMelo Ball|Jaylen Brown|Anthony Davis|Kawhi Leonard|Damian Lillard|Jimmy Butler|Bam Adebayo|Tyler Herro|Karl-Anthony Towns|Rudy Gobert|Kristaps Porziņģis|Bronny James|Draymond Green|Klay Thompson|Kyrie Irving|James Harden|Jrue Holiday|Khris Middleton|DeMar DeRozan|Ben Simmons|DeAndre Ayton|Lonzo Ball|Erik Spoelstra|Dillon Brooks|Max Verstappen|Lando Norris|Charles Leclerc|Oscar Piastri|George Russell|Lewis Hamilton|Carlos Sainz|Fernando Alonso|Pierre Gasly|Esteban Ocon|Alex Albon|Yuki Tsunoda|Lance Stroll|Nico Hülkenberg|Andrea Kimi Antonelli|Oliver Bearman|Liam Lawson|Franco Colapinto|Christian Horner|Toto Wolff|Adrian Newey|Zak Brown|Martin Brundle|David Croft|Sergio Pérez|Zhou Guanyu`};
+{const L=new Set(ERA.L.split("|")),C=new Set(ERA.C.split("|"));DB.forEach(p=>p.era=L.has(p.name)?"L":C.has(p.name)?"C":"M")}
+const maxImp=n=>n<=5?1:n<=8?2:3;
+function poolFor(sports,diff,era){const f=p=>p.sports.some(s=>sports.includes(s)),L={easy:"E",medium:"M",hard:"H"}[diff],E=era&&era!=="all"?{legends:"L",modern:"M",current:"C"}[era]:null,all=DB.filter(f),ok=(d,e)=>all.filter(p=>(!d||p.diff===d)&&(!e||p.era===e));let a=ok(L,E);if(a.length)return{list:a,fallback:false};a=ok(null,E);if(a.length)return{list:a,fallback:true};a=ok(L,null);return{list:a.length?a:all,fallback:true}}
+function makeRound(n,k,sports,diff,used,era){const{list}=poolFor(sports,diff,era);const fresh=list.filter(p=>!used.includes(p.id));const person=(fresh.length?fresh:list)[rnd((fresh.length?fresh:list).length)];const imp=shuffle([...Array(n).keys()]).slice(0,k).sort((a,b)=>a-b);return{pid:person.id,imp,scored:false}}
+function resolveVotes(c,k){const o=c.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]||a[1]-b[1]);const tie=o[0][0]===0||(k<o.length&&o[k-1][0]===o[k][0]);return{accused:o.slice(0,k).map(x=>x[1]),tie}}
+function judge(votes,imp){const r=resolveVotes(votes,imp.length);const caught=r.tie?[]:r.accused.filter(i=>imp.includes(i));return{...r,caught,crewWin:!r.tie&&caught.length===imp.length}}
+const pick=a=>a[rnd(a.length)];
+const GR={football:r=>/keeper/.test(r)?"gk":/defend/.test(r)?"df":/manager/.test(r)?"mg":/striker/.test(r)?"st":/mid|playmaker/.test(r)?"md":"fw",basketball:r=>/center/.test(r)?"c":/guard/.test(r)?"g":/coach|analyst|broadcaster/.test(r)?"o":"f",ufc:r=>/pioneer/.test(r)?"pi":/commentator|announcer|president|crossover/.test(r)?"ex":/light ?heavy|middle|welter/.test(r)?"md":/heavy/.test(r)?"hv":"lt",wwe:()=>"w",f1:r=>/driver/.test(r)?"dr":"of"};
+const STY={football:{gk:"Their job is to stop goals rather than score them",df:"Judged more on what they stop than what they create",md:"Does a lot of their work away from the goal",st:"Lives and dies by goals",fw:"Most dangerous with the ball near the opposition box",mg:"Judged on tactics and decisions rather than touches"},basketball:{c:"Does most of their work close to the basket",g:"Handles the ball and runs plays",f:"Expected to be versatile, a bit of everything",o:"Influences the game from outside the court"},ufc:{lt:"Competes in the lighter weight classes",md:"Competes in the middle weight classes",hv:"Competes in the heavy divisions",pi:"From the early, wild days of the sport",ex:"Part of the show around the cage, or known beyond it"},wwe:{w:"Lives off the crowd's reaction as much as skill"},f1:{dr:"Judged on lap times and consistency",of:"Shapes the team away from the steering wheel"}};
+const BLD={football:{gk:"Usually a tall frame"},basketball:{c:"Usually very tall",g:"Often smaller than the big men"},ufc:{hv:"A large frame",lt:"A lighter frame"}};
+function rawFacts(p,s){const r=(p.roles[s]||"").toLowerCase(),g=GR[s](r),f=[],T=p.team?p.team.split(", "):[];
+if(STY[s][g])f.push({k:"sy:"+g,t:STY[s][g]});if(BLD[s]&&BLD[s][g])f.push({k:"bd:"+g,t:BLD[s][g]});
+f.push({k:"er:"+p.era,t:{L:"A name from an earlier generation",M:"Peaked sometime in the last couple of decades",C:"Someone you could watch right now"}[p.era]});
+f.push({k:"tr:"+p.diff,t:{E:"Even casual fans would know the name",M:"Mostly known by people who follow the sport",H:"More of a fan's pick than a household name"}[p.diff]});
+if(s==="football"||s==="basketball"||s==="f1"){if(g!=="o"&&g!=="of"){if(T.length>1)f.push({k:"tm:m",t:"Has been linked with more than one team"});else if(T.length===1)f.push({k:"tm:o",t:"Mostly linked with one team"})}}
+else if(T.some(x=>!/^(UFC|WWE|WWF)$/.test(x)))f.push({k:"pm:o",t:"Has also appeared in other promotions or sports"});
+return f}
+const FIT={};function fit(s,k){const x=s+k;if(FIT[x]==null)FIT[x]=DB.filter(q=>q.sports.includes(s)&&rawFacts(q,s).some(f=>f.k===k)).length;return FIT[x]}
+const FACTS=(p,s)=>rawFacts(p,s).filter(f=>fit(s,f.k)>=8);
+function clueFor(p,sports,strength){const s=p.sports.find(x=>sports.includes(x))||p.sports[0],F=FACTS(p,s);if(!F.length)return"Think of someone fans like to argue about.";
+if(strength==="clear"&&F.length>1){const sh=shuffle(F);for(let i=0;i<sh.length;i++)for(let j=i+1;j<sh.length;j++){const a=sh[i],b=sh[j];if(DB.filter(q=>{if(!q.sports.includes(s))return false;const k=rawFacts(q,s).map(f=>f.k);return k.includes(a.k)&&k.includes(b.k)}).length>=4)return a.t+". "+b.t+"."}}
+return pick(F).t+"."}
+function outcome(j,gs,ok){if(!j.crewWin)return{winner:"imp",how:"escaped"};if(!gs)return{winner:"crew",how:"caught"};return ok?{winner:"imp",how:"stolen"}:{winner:"crew",how:"failed"}}
+const SHARED=[
+{t:"Everyone must use an exaggerated reaction at least once.",c:["Big feelings make a good performance.","Don't be afraid to overreact."]},
+{t:"Everyone must work a sports-commentator phrase into the conversation.",c:["Imagine a microphone in front of you.","Commentary is welcome here."]},
+{t:"The next speaker must briefly acknowledge the previous clue before giving theirs.",c:["Show that you were listening.","Always respond before you add."]},
+{t:"Everyone must sound like they're giving a post-match interview.",c:["The cameras are on after the final whistle.","Talk like the press is listening."]},
+{t:"Everyone must use an unusually formal word at least once.",c:["Fancy vocabulary is encouraged.","Sound distinguished."]},
+{t:"Everyone must find a natural moment to say \"that's debatable\".",c:["Some things can be argued either way.","Everything is up for debate."]},
+{t:"Everyone must give one clue with total confidence, however vague.",c:["Confidence beats accuracy.","Say it like you mean it."]},
+{t:"Everyone must use the name of whoever they're talking to.",c:["Keep it personal.","Address people directly."]},
+{t:"Everyone must end one sentence with \"obviously\".",c:["Some things are just plain to see.","Make it sound obvious."]}];
+const IND=["Casually disagree with the first opinion you hear.","Say \"Interesting...\" before you speak after someone gives a clue.","Use the word \"legendary\" naturally at least twice.","Talk like an expert analyst giving a post-match interview.","When someone asks you something, turn it into a question about them.","Defend your clue as the greatest sporting insight of all time.","Mention a completely different sport once, without making it obvious.","Sound suspiciously confident every time you speak.","Hesitate before your clue as if you're about to reveal something huge.","React as if you've heard a scandal whenever a name is mentioned.","Slip a commentator-style phrase into the conversation.","Pitch your clue to a panel of imaginary judges.","Nod slowly and thoughtfully while others speak.","Start one sentence with \"Back in my day...\".","Compliment the previous clue, then quietly question it.","Speak a little quieter than usual, like you're sharing a secret.","Say \"to be fair\" before giving any opinion.","Pretend your clue is far more complicated than it is.","Give your clue a dramatic title.","Ask someone to repeat themselves once.","Change your mind once, out loud.","Say \"as I always say\" before one point.","Keep a poker face and never laugh.","Describe your clue like a movie trailer."];
+const INDS={football:["Describe your clue like a transfer rumour."],basketball:["Call your clue a clutch moment."],ufc:["Announce your clue like a fight introduction."],wwe:["Deliver your clue like a wrestling promo."]};
+const SNEED=[["react"],["comm"],["ack"],["interview"],["formal"],[],["conf"],[],[]];
+const INO={"Keep a poker face and never laugh.":["react"],"Speak a little quieter than usual, like you're sharing a secret.":["react"],"Hesitate before your clue as if you're about to reveal something huge.":["conf"],"Talk like an expert analyst giving a post-match interview.":["interview"],"Slip a commentator-style phrase into the conversation.":["comm"]};
+const clash=(si,r)=>(INO[r]||[]).some(x=>SNEED[si].includes(x));
+function checkChaos(ch,n,sport){const bad=[],si=SHARED.findIndex(x=>x.t===ch.shared);if(si<0)bad.push("unknown shared rule");if(!ch.per||ch.per.length!==n||!ch.hint||ch.hint.length!==n)return bad.concat("wrong rule count");if(new Set(ch.per).size!==n)bad.push("duplicate individual rule");
+ch.per.forEach((r,i)=>{if(!r){bad.push("empty rule "+i);return}if(!IND.includes(r)&&!Object.values(INDS).some(a=>a.includes(r)))bad.push("unknown rule: "+r);for(const k in INDS)if(k!==sport&&INDS[k].includes(r))bad.push("wrong sport rule: "+r);if(si>=0&&clash(si,r))bad.push("conflict with group rule: "+r);if(si>=0&&!SHARED[si].c.includes(ch.hint[i]))bad.push("bad hint "+i)});return bad}
+function makeChaos(n,sport){for(let a=0;a<30;a++){const sh=pick(SHARED),si=SHARED.indexOf(sh),pool=shuffle(IND.concat(INDS[sport]||[]).filter(r=>!clash(si,r)));if(pool.length<n)continue;const ch={shared:sh.t,per:pool.slice(0,n),hint:Array.from({length:n},()=>pick(sh.c))};if(!checkChaos(ch,n,sport).length)return ch}throw new Error("chaos rules unavailable")}
+function auditChaos(){const bad=[],names=DB.map(p=>p.name.toLowerCase());
+SHARED.forEach((sh,si)=>{if(sh.c.length<2)bad.push("needs 2+ hints: "+sh.t);const q=(sh.t.match(/"([^"]+)"/)||[])[1];sh.c.forEach(h=>{if(h.includes(sh.t))bad.push("hint repeats rule: "+h);if(q&&h.toLowerCase().includes(q.toLowerCase()))bad.push("hint gives away phrase: "+h)});
+for(const sp of Object.keys(SPORTS)){const pool=IND.concat(INDS[sp]||[]).filter(r=>!clash(si,r));if(pool.length<12)bad.push("pool too small for "+sp+" / "+sh.t)}});
+IND.concat(...Object.values(INDS)).concat(SHARED.map(x=>x.t)).forEach(r=>{if(r.length>110)bad.push("too long: "+r);if(names.some(nm=>nm.length>4&&new RegExp("(^|[^a-z])"+nm.replace(/[^a-z0-9 ]/g,".")+"([^a-z]|$)").test(r.toLowerCase())))bad.push("mentions an athlete: "+r)});
+for(const sp of Object.keys(SPORTS))for(let i=0;i<150;i++){const n=3+i%10,ch=makeChaos(n,sp),b=checkChaos(ch,n,sp);if(b.length){bad.push(sp+": "+b[0]);break}}
+return bad}
+function decoyFor(p,sport){const f=x=>(x||"").split(/[ \/,]/)[0].toLowerCase(),c=DB.filter(x=>x.id!==p.id&&x.sports.includes(sport)).map(x=>({x,sc:(f(x.roles[sport])===f(p.roles[sport])?3:0)+(x.nat===p.nat?2:0)+(x.team&&p.team&&x.team.split(", ").some(t=>p.team.split(", ").includes(t))?2:0)+(x.diff===p.diff?1:0)+Math.random()*1.5})).sort((a,b)=>b.sc-a.sc);return c.length?c[rnd(Math.min(4,c.length))].x.id:null}
+//ENDLOGIC
+
+// ===================== STATE =====================
+const KEY="sports_impostor_v1";
+const defCfg=()=>({n:5,sports:Object.keys(SPORTS),diff:"random",imp:1,hs:"subtle",era:"all",start:"rand",guess:false,chaos:false,mole:false,sound:true});
+const fresh=()=>({phase:"home",cfg:defCfg(),names:Array.from({length:12},(_,i)=>"Player "+(i+1)),scores:[],roundNo:0,round:null,ri:0,shown:false,order:[],ti:0,votes:[],res:null,used:[],err:""});
+let S=fresh();
+try{const x=JSON.parse(localStorage.getItem(KEY)||"null");if(x&&x.cfg&&x.names){S=Object.assign(fresh(),x,{cfg:Object.assign(defCfg(),x.cfg)});if(x.cfg.hs===undefined&&x.cfg.hint===false)S.cfg.hs="off"}}catch(e){}
+S.shown=false;S.confirm=null;S.cs=4;if(S.phase==="suspense")S.phase="result";if(!S.res&&["result","guess","suspense"].includes(S.phase))S.phase="home";if(S.round&&(!S.round.sport||!DB.find(p=>p.id===S.round.pid))){S=Object.assign(fresh(),{cfg:S.cfg,names:S.names})}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const buzz=(p=15)=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const person=()=>DB.find(p=>p.id===S.round.pid);
+const P=()=>S.names.slice(0,S.cfg.n);
+const sportLabel=()=>S.cfg.sports.length===Object.keys(SPORTS).length?"Mixed Sports":S.cfg.sports.map(s=>SPORTS[s].n).join(" + ");
+
+// ===================== ACTIONS =====================
+function cleanNames(){const seen={};S.names=S.names.map((n,i)=>(n||"").trim()||"Player "+(i+1));return P().map(n=>{const k=n.toLowerCase();seen[k]=(seen[k]||0)+1;return seen[k]>1?n+" "+seen[k]:n})}
+const SFX=(()=>{let ctx;const AC=typeof window!=="undefined"&&(window.AudioContext||window.webkitAudioContext),c=()=>{if(!AC)return null;try{if(!ctx)ctx=new AC();if(ctx.state==="suspended")ctx.resume();return ctx}catch(e){return null}},on=()=>S.cfg.sound!==false;
+function tone(f,d,type="sine",v=.12,t=0,f2){const x=c();if(!x||!on())return;const o=x.createOscillator(),g=x.createGain(),n=x.currentTime+t;o.type=type;o.frequency.setValueAtTime(f,n);if(f2)o.frequency.exponentialRampToValueAtTime(f2,n+d);g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(v,n+.015);g.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(g);g.connect(x.destination);o.start(n);o.stop(n+d+.05)}
+function noise(d,v=.1,t=0,fq=1200){const x=c();if(!x||!on())return;const b=x.createBuffer(1,Math.max(1,x.sampleRate*d|0),x.sampleRate),a=b.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=(Math.random()*2-1)*(1-i/a.length);const s=x.createBufferSource(),f=x.createBiquadFilter(),g=x.createGain(),n=x.currentTime+t;s.buffer=b;f.type="bandpass";f.frequency.value=fq;g.gain.value=v;s.connect(f);f.connect(g);g.connect(x.destination);s.start(n)}
+return{tone,noise}})();
+const STING={football:()=>{SFX.tone(440,.7,"sawtooth",.08);SFX.tone(447,.7,"sawtooth",.08)},ufc:()=>[0,.2,.4].forEach(t=>{SFX.tone(1320,.7,"sine",.1,t);SFX.tone(1980,.4,"sine",.04,t)}),wwe:()=>{SFX.tone(98,1.4,"sine",.2);SFX.noise(.5,.12,0,400);SFX.tone(392,1,"triangle",.06,.1)},basketball:()=>SFX.tone(210,.8,"square",.09),f1:()=>{SFX.tone(70,.9,"sawtooth",.1,0,650);SFX.tone(140,.9,"square",.04,0,1300)}};
+function sfx(n,a){try{({tap:()=>SFX.tone(520,.05,"square",.035),reveal:()=>{SFX.noise(.25,.08,0,2500);SFX.tone(300,.25,"triangle",.08,0,900)},lock:()=>{SFX.tone(180,.25,"sawtooth",.1);SFX.tone(90,.4,"sine",.15,.05)},riser:()=>SFX.tone(120,2.1,"sawtooth",.05,0,900),tick:()=>SFX.tone(a===1?1100:800,.14,"square",.07),sting:()=>(STING[a]||STING.football)(),chime:()=>SFX.tone(880,.3,"sine",.05),win:()=>a==="crew"?[523,659,784,1047].forEach((f,i)=>SFX.tone(f,.3,"triangle",.1,i*.12)):[196,185,147,98].forEach((f,i)=>{SFX.tone(f,.55,"sawtooth",.06,i*.22);SFX.tone(f/2,.55,"sine",.08,i*.22)})}[n]||(()=>{}))()}catch(e){}}
+function sfxStage(){if(S.phase!=="result")return;const k=S.round.sport;if(S.cs===0)sfx("tick",S.cd);else if(S.cs===1)sfx("sting",k);else if(S.cs===2)sfx("win",S.res.winner);else if(S.cs===3)sfx("chime")}
+let TM=[],TOK=0;const RMO=typeof matchMedia!=="undefined"&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function clearTM(){TM.forEach(clearTimeout);TM=[];TOK++}
+function runSeq(list){clearTM();const tk=TOK;list.forEach(([ms,fn])=>TM.push(setTimeout(()=>{if(tk!==TOK||!["result","suspense"].includes(S.phase))return;const b=S.cs+"/"+S.cd;fn();save();render();if(S.phase==="result"&&b!==S.cs+"/"+S.cd)sfxStage()},RMO?ms/2:ms)))}
+function startCine(){S.phase="result";S.cd=3;if(S.res&&S.res.gs!=null){S.cs=1;runSeq([[2450,()=>S.cs=2],[4350,()=>S.cs=3],[5450,()=>S.cs=4]])}else{S.cs=0;runSeq([[750,()=>S.cd=2],[1500,()=>S.cd=1],[2250,()=>S.cs=1],[4700,()=>S.cs=2],[6600,()=>S.cs=3],[7700,()=>S.cs=4]])}}
+function startSuspense(){S.phase="suspense";sfx("riser");runSeq([[2300,startCine]])}
+function fin(ok){if(S.res.how)return false;Object.assign(S.res,outcome(S.res,S.res.gs!=null,ok));return true}
+function startGame(){const c=S.cfg;if(!c.sports.length){S.err="Pick at least one sport.";return}const nm=cleanNames();S.names=nm.concat(S.names.slice(c.n));S.roundNo=0;S.used=[];S.err="";newRound()}
+function newRound(){const c=S.cfg;S.roundNo++;S.round=makeRound(c.n,c.imp,c.sports,c.diff,S.used,c.era);S.used.push(S.round.pid);{const pp=DB.find(p=>p.id===S.round.pid),ok=pp.sports.filter(x=>c.sports.includes(x));S.round.sport=ok[rnd(ok.length)];S.round.hint=c.hs==="off"?"":clueFor(pp,[S.round.sport],c.hs);S.round.chaos=c.chaos?makeChaos(c.n,S.round.sport):null;S.round.decoy=c.mole?decoyFor(pp,S.round.sport):null}S.ri=0;S.shown=false;S.res=null;S.votes=Array(c.n).fill(0);const st=c.start==="rand"?rnd(c.n):0;S.order=Array.from({length:c.n},(_,i)=>(st+i)%c.n);S.ti=0;S.phase="handover"}
+function restartRound(){S.roundNo--;S.used.pop();newRound()}
+const A={
+ play(){S.phase="setup"},home(){S.phase="home"},
+ n(e){const c=S.cfg;c.n=clamp(c.n+ +e.dataset.d,3,12);c.imp=Math.min(c.imp,maxImp(c.n))},
+ imp(e){const c=S.cfg;c.imp=clamp(c.imp+ +e.dataset.d,1,maxImp(c.n))},
+ rounds(e){S.cfg.rounds=clamp(S.cfg.rounds+ +e.dataset.d,0,15)},
+ sport(e){const c=S.cfg,k=e.dataset.k;c.sports=c.sports.includes(k)?c.sports.filter(x=>x!==k):[...c.sports,k]},
+ mixed(){S.cfg.sports=Object.keys(SPORTS)},
+ diff(e){S.cfg.diff=e.dataset.k},hs(e){S.cfg.hs=e.dataset.k},era(e){S.cfg.era=e.dataset.k},start(e){S.cfg.start=e.dataset.k},
+ tog(e){S.cfg[e.dataset.k]=!S.cfg[e.dataset.k]},
+ go(){startGame()},
+ reveal(){S.shown=true;buzz();sfx("reveal")},
+ hide(){if(S.cfg.chaos&&S.round.chaos&&S.shown===true){S.shown=2;buzz(10);return}S.shown=false;S.ri++;S.phase=S.ri>=S.cfg.n?"ready":"handover";buzz(10)},
+ begin(){S.phase="play"},
+ nextTurn(){S.ti++;buzz(10)},
+ toVote(){S.phase="vote"},
+ v(e){const i=+e.dataset.i;S.votes[i]=Math.max(0,S.votes[i]+ +e.dataset.d)},
+ tally(){if(S.phase!=="vote")return;if(S.votes.reduce((a,b)=>a+b,0)===0){S.err="Enter at least one vote first.";return}S.err="";const j=judge(S.votes,S.round.imp);S.res=j;if(j.crewWin&&S.cfg.guess){S.res.gs=0;S.res.guesser=j.caught[0];S.phase="guess";buzz([30,40,30])}else{fin(false);startCine();sfxStage()}},
+ pick(e){if(S.phase==="guess"&&S.res.gs===0)S.res.guesser=+e.dataset.i},
+ lockg(){if(S.phase==="guess"&&S.res.gs===0){S.res.gs=1;buzz(40);sfx("lock")}},
+ gres(e){if(S.phase!=="guess"||S.res.gs!==1||S.res.how)return;const ok=e.dataset.k==="1";fin(ok);startCine();sfxStage()},
+ skip(){clearTM();S.cs=4},
+ skipS(){if(S.phase==="suspense")startCine()},
+ again(){newRound()},
+ restart(){S.confirm="restart"},
+ leave(){S.confirm="leave"},
+ no(){S.confirm=null},
+ yes(){const c=S.confirm;S.confirm=null;if(c==="restart")restartRound();else if(c==="leave"){S.back=S.phase;S.phase="home"}},
+ testrun(){S.phase="tests"}
+};
+document.addEventListener("click",e=>{const el=e.target.closest("[data-a]");if(!el)return;S.err="";sfx("tap");A[el.dataset.a](el);save();render()});
+document.addEventListener("input",e=>{if(e.target.dataset.nm!==undefined){S.names[+e.target.dataset.nm]=e.target.value;save()}else if(e.target.dataset.num){S.cfg[e.target.dataset.num]=clamp(parseInt(e.target.value)||0,0,20);save()}});
+
+// ===================== VIEWS =====================
+const TAG={f1:"Lights out. Find the impostor.",football:"Kick-off. Find the impostor.",ufc:"Fight night. Find the impostor.",wwe:"Main event. Find the impostor.",basketball:"Tip-off. Find the impostor."};
+const banner=()=>{const k=S.round.sport,o=SPORTS[k];return`<div class="banner"><span class="ico">${ICON[k]}</span><div><b>${o.n.toUpperCase()} ROUND</b><div class="small mu">${TAG[k]}</div>${S.cfg.chaos&&S.round.chaos?'<span class="chaos">CHAOS ROUND</span>':""}</div></div>`};
+const trow=(k,l,d)=>`<div class="row sp" style="margin-top:14px"><span>${l}<br><span class="mu small">${d}</span></span><button class="chip ${S.cfg[k]?"on":""}" style="flex:0 0 80px" data-a="tog" data-k="${k}" aria-pressed="${S.cfg[k]}">${S.cfg[k]?"On":"Off"}</button></div>`;
+const bar=()=>banner()+`<div class="bar"><button data-a="leave" aria-label="Home">&larr; Home</button><span class="mu small">${esc(SPORTS[S.round.sport].n)} &middot; Round ${S.roundNo}</span><button data-a="tog" data-k="sound" class="${S.cfg.sound!==false?"":"off"}" aria-pressed="${S.cfg.sound!==false}">Sound</button><button data-a="restart">Restart</button></div>`;
+const btn=(a,t,cls="",x="")=>`<button class="btn ${cls}" data-a="${a}" ${x}>${t}</button>`;
+const stepper=(a,v,lab,extra="")=>`<div class="row sp"><span>${lab}</span><div class="step"><button data-a="${a}" data-d="-1" aria-label="Decrease ${lab}">&minus;</button><b>${v}</b><button data-a="${a}" data-d="1" aria-label="Increase ${lab}">+</button></div></div>${extra}`;
+
+const vfx=(k,w)=>{const N=(c,f)=>Array.from({length:c},(_,i)=>f(i)).join(""),r=i=>(i*37+11)%100,oct='<svg viewBox="0 0 100 100"><polygon points="30,2 70,2 98,30 98,70 70,98 30,98 2,70 2,30" fill="none" stroke="currentColor" stroke-width="3"/></svg>';
+const m={crew:{f1:`<div class="vfx v-1c">${N(14,i=>`<u style="top:${r(i)}%;animation-delay:${(i%7)*.1}s"></u>`)}<div class="flag"></div></div>`,football:`<div class="vfx v-fc">${N(30,i=>`<i style="left:${r(i)}%;animation-delay:${(i%9)*.1}s;background:${["#22c55e","#fff","#bbf7d0","#facc15"][i%4]}"></i>`)}</div>`,
+ufc:`<div class="vfx v-uc"><b>${oct}</b><b>${oct}</b><b>${oct}</b></div>`,
+wwe:`<div class="vfx v-wc">${N(28,i=>`<i style="left:${i%2?4+r(i)%16:80+r(i)%16}%;--dx:${(i%2?1:-1)*(20+r(i))}px;animation-delay:${(i%7)*.08}s"></i>`)}</div>`,
+basketball:`<div class="vfx v-bc">${N(9,i=>`<span style="left:${4+r(i)*.88}%;animation-delay:${(i%5)*.15}s">${ICON.basketball}</span>`)}</div>`},
+imp:{f1:`<div class="vfx v-1i"><div class="clock dnf">DNF</div></div>`,football:`<div class="vfx v-fi"><div class="redcard"></div></div>`,
+ufc:`<div class="vfx v-ui"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path pathLength="1" d="M50 0 L44 18 L56 34 L42 52 L55 70 L47 100"/><path pathLength="1" d="M44 18 L22 30 L10 52"/><path pathLength="1" d="M56 34 L80 40 L96 62"/><path pathLength="1" d="M42 52 L30 76 L12 90"/></svg></div>`,
+wwe:`<div class="vfx v-wi"></div>`,
+basketball:`<div class="vfx v-bi"><div class="clock">0.0</div></div>`}};return m[w==="crew"?"crew":"imp"][k]};
+const V={
+home(){const cnt=s=>DB.filter(p=>p.sports.includes(s)).length;return`<div style="padding-top:20px"><div class="floaters">${Object.keys(SPORTS).map(s=>`<span style="--c:${SPORTS[s].c}">${ICON[s]}</span>`).join("")}</div><span class="badge">PARTY GAME</span><h1 style="margin-top:12px">${esc(APP_NAME.split(" ")[0])}<br><span class="glow">${esc(APP_NAME.split(" ").slice(1).join(" "))}</span></h1>
+<p class="mu">One phone. One secret athlete. One of you has no idea who it is.</p>
+${btn("play","Play")}
+<h3>How it works</h3><div class="card"><ol style="margin:0;padding-left:20px"><li>Pass the phone. Everyone privately sees the secret person &mdash; except the impostor.</li><li>Take turns giving one clue each. Be vague enough to fool the impostor, specific enough to prove you know.</li><li>Vote out the impostor, then find out who it really was.</li></ol></div>
+<h3>Choose categories &middot; ${DB.length} people</h3><div class="row">${Object.keys(SPORTS).map(s=>{const on=S.cfg.sports.includes(s);return`<button class="tile ${on?"on":""}" style="--c:${SPORTS[s].c}" data-a="sport" data-k="${s}" aria-pressed="${on}"><span class="wm">${ICON[s]}</span><span class="ico">${ICON[s]}</span><span class="badge" style="margin-left:8px">${SPORTS[s].b}</span><div style="font-weight:800;margin-top:8px">${SPORTS[s].n}</div><div class="mu small">${cnt(s)} people</div></button>`}).join("")}</div><button class="btn alt sm" data-a="mixed" style="margin-top:10px">Select all (Mixed)</button>
+<p class="center mu small" style="margin-top:28px"><button data-a="testrun" style="background:none;border:0;color:var(--mu);text-decoration:underline;cursor:pointer;min-height:44px">Run self-tests</button></p></div>`},
+setup(){const c=S.cfg,pl=poolFor(c.sports,c.diff,c.era);
+return`<div class="bar"><button data-a="home">&larr; Home</button><span class="mu small">Setup</span><span></span></div><h2>Game setup</h2>
+<div class="card">${stepper("n",c.n,"Players")}<p class="mu small" style="margin:6px 0 0">3&ndash;12 players.</p></div>
+<h3>Names</h3><div class="card">${P().map((n,i)=>`<label class="small mu" for="p${i}">Player ${i+1}</label><input type="text" id="p${i}" data-nm="${i}" value="${esc(n)}" maxlength="16" style="margin-bottom:8px" autocomplete="off">`).join("")}</div>
+<h3>Sport</h3><div class="row">${Object.keys(SPORTS).map(s=>`<button class="chip ${c.sports.includes(s)?"on":""}" style="--c:${SPORTS[s].c}" data-a="sport" data-k="${s}" aria-pressed="${c.sports.includes(s)}"><i class="mi">${ICON[s]}</i>${SPORTS[s].n}</button>`).join("")}<button class="chip ${c.sports.length===Object.keys(SPORTS).length?"on":""}" data-a="mixed">Mixed (all)</button></div>
+<h3>Difficulty</h3><div class="row">${["easy","medium","hard","random"].map(d=>`<button class="chip ${c.diff===d?"on":""}" data-a="diff" data-k="${d}">${d[0].toUpperCase()+d.slice(1)}</button>`).join("")}</div>
+<p class="mu small">${({easy:"Bait names everybody on earth knows.",medium:"Well known to regular fans, a step harder.",hard:"Deep cuts. Real fans only.",random:"Any difficulty mixed together."})[c.diff]} ${pl.list.length} people in the pool.${pl.fallback?" (None at this level for your sports, so all levels are used.)":""}</p>
+<h3>Era</h3><div class="row">${[["all","All eras"],["legends","Legends"],["modern","Modern"],["current","Current"]].map(([k,l])=>`<button class="chip ${c.era===k?"on":""}" data-a="era" data-k="${k}">${l}</button>`).join("")}</div><p class="mu small">${({all:"Anyone from any generation.",legends:"Careers mostly before the mid-2000s.",modern:"The 2000s and 2010s.",current:"Active right now."})[c.era]}</p>
+<h3>Rules</h3><div class="card">${stepper("imp",c.imp,"Impostors")}<p class="mu small" style="margin:6px 0 14px">Max ${maxImp(c.n)} for ${c.n} players.</p>
+<div class="row" style="margin-bottom:12px"><span style="flex:1">First speaker</span><button class="chip ${c.start==="cw"?"on":""}" data-a="start" data-k="cw">Player 1</button><button class="chip ${c.start==="rand"?"on":""}" data-a="start" data-k="rand">Random</button></div>
+<div style="margin-top:14px">Impostor hint<br><span class="mu small">${({off:"No hint at all.",subtle:"One vague trait that fits many athletes.",clear:"Two traits that narrow it down."})[c.hs]}</span><div class="row" style="margin-top:8px">${["off","subtle","clear"].map(k=>`<button class="chip ${c.hs===k?"on":""}" data-a="hs" data-k="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join("")}</div></div>${trow("guess","Final Impostor Guess","Caught impostors get one final chance to steal the win")}${trow("chaos","Chaos Round","Hidden group rules, secret personal rules, maximum chaos")}${trow("mole","Mole mode","Impostors get a similar athlete and don't know they're the impostor")}${trow("sound","Sound effects","Made in your browser, no downloads")}</div>
+${S.err?`<p class="err">${esc(S.err)}</p>`:""}${btn("go","Start game")}`},
+handover(){const n=P()[S.ri];return`${bar()}<div class="card lock"><span class="badge">PRIVATE</span><p class="mu" style="margin:16px 0 4px">Pass the phone to</p><div class="big glow">${esc(n)}</div><p class="mu small">Player ${S.ri+1} of ${S.cfg.n}. Everyone else look away.</p></div>
+${S.shown===2?V.chaosCard():S.shown?V.role():btn("reveal","I'm "+esc(n)+" &mdash; show my role")}`},
+role(){const n=P()[S.ri],isI=S.round.imp.includes(S.ri)&&!S.round.decoy,p=(S.round.imp.includes(S.ri)&&S.round.decoy&&DB.find(x=>x.id===S.round.decoy))||person(),sp=S.round.sport;
+return`<div class="card secret ${isI?"imp":""}" role="status" style="--c:${SPORTS[sp].c}"><span class="wm">${ICON[sp]}</span><span class="badge">${isI?"YOU ARE THE":"SECRET PERSON"}</span>${isI?`<div class="big" style="color:var(--bad);margin:14px 0">Impostor</div><p>You don't know who it is. Category: <b>${esc(SPORTS[sp].n)}</b></p><p class="mu small">Listen to the clues, blend in, and work out the secret person.${S.round.imp.length>1?" Don't reveal yourself to the other impostor.":""}</p>${S.round.hint?`<div class="hintbox"><span class="badge">YOUR HINT</span><p style="margin:8px 0 0;font-weight:700">${esc(S.round.hint)}</p></div>`:""}`:`<div class="big" style="margin:14px 0">${esc(p.name)}</div><p>${esc(SPORTS[sp].n)} &middot; ${esc(p.roles[sp])}</p><p class="mu small">${esc(p.nat)}${p.team?" &middot; "+esc(p.team):""}</p>`}</div>
+${btn("hide",S.cfg.chaos&&S.round.chaos?"Next: my chaos rule":"Hide &amp; pass the phone")}`},
+chaosCard(){const c=S.round.chaos,i=S.ri;return`<div class="card secret chaoscard" role="status"><span class="badge">CHAOS ROUND</span><h3>Your secret rule</h3><div class="rule">${esc(c.per[i])}</div><h3>Hint about the group rule</h3><p style="font-weight:700">${esc(c.hint[i])}</p><p class="mu small">Never show this to anyone. Follow your rule naturally, and notice what everyone else is doing.</p></div>${btn("hide","Got it &mdash; hide my rule")}`},
+ready(){const f=P()[S.order[0]];return`${bar()}<div class="card center"><span class="badge">ALL ROLES SEEN</span><h2 style="margin:14px 0">Round started</h2><p>Everyone gives <b>one clue</b> about the secret person. Don't say the name.</p><p class="mu">Starting with</p><div class="big glow">${esc(f)}</div><p class="mu small">Then clockwise around the group.</p>${S.cfg.chaos&&S.round.chaos?'<p class="small"><span class="chaos">CHAOS ROUND</span> Follow your private rule and watch for the group rule.</p>':""}</div>${btn("begin","Start clues")}`},
+play(){const o=S.order,n=P(),done=S.ti>=o.length;return`${bar()}<div class="card center"><span class="badge">CLUES</span>${done?`<h2 style="margin:14px 0">Everyone has spoken</h2><p class="mu">Debate who's bluffing, then vote.</p>`:`<p class="mu" style="margin:14px 0 4px">Now speaking</p><div class="big glow">${esc(n[o[S.ti]])}</div><p class="mu small">One clue, then pass.</p>`}</div>
+<div class="turn">${o.map((i,k)=>`<span class="${k<S.ti?"d":k===S.ti?"c":""}">${esc(n[i])}</span>`).join("")}</div>
+${done?btn("toVote","Go to voting"):btn("nextTurn","Next speaker")+btn("toVote","Skip to voting","alt")}`},
+vote(){const n=P(),k=S.round.imp.length,t=S.votes.reduce((a,b)=>a+b,0);return`${bar()}<h2>Voting</h2><p class="mu">Count hands aloud, then enter the totals. ${k>1?`There are <b>${k} impostors</b>: the top ${k} vote-getters are accused and the crew must catch all of them.`:"Most votes is accused."}</p>
+<div class="card">${n.map((x,i)=>`<div class="row sp" style="padding:6px 0">${esc(x)}<div class="step"><button data-a="v" data-i="${i}" data-d="-1" aria-label="Remove vote for ${esc(x)}">&minus;</button><b>${S.votes[i]}</b><button data-a="v" data-i="${i}" data-d="1" aria-label="Add vote for ${esc(x)}">+</button></div></div>`).join("")}<p class="mu small" style="margin-bottom:0">${t} vote${t===1?"":"s"} counted. Ties mean the impostor escapes.</p></div>
+${S.err?`<p class="err">${esc(S.err)}</p>`:""}${btn("tally","Reveal result")}`},
+guess(){const n=P(),r=S.res,g=esc(n[r.guesser]);return`${bar()}<div class="card center shot"><span class="badge">CAUGHT</span><h1 class="shoth">One last shot</h1>
+${r.caught.length>1&&r.gs===0?`<p class="mu">Caught: pick who takes the shot.</p><div class="row" style="justify-content:center">${r.caught.map(i=>`<button class="chip ${i===r.guesser?"on":""}" data-a="pick" data-i="${i}">${esc(n[i])}</button>`).join("")}</div>`:""}
+<div class="big glow" style="margin:14px 0">${g}</div>
+${r.gs===0?`<p>You were caught. Say out loud who you think the secret athlete is.</p><p class="mu small">Everyone else: stay silent and keep the answer to yourselves.</p>`:`<p>Guess locked in.</p><p class="mu small">Crew: you know the real answer. Was ${g} right?</p>`}</div>
+${r.gs===0?btn("lockg","Lock in final guess"):btn("gres","Yes, they got it","ok",'data-k="1"')+btn("gres","No, wrong","bad",'data-k="0"')}`},
+suspense(){const k=S.round.sport;return`${banner()}<div class="card center susp"><span class="susp-ico">${ICON[k]}</span><h2 style="margin:16px 0 6px">Guess locked</h2><div class="dots"><i></i><i></i><i></i></div></div>${btn("skipS","Skip","alt")}`},
+result(){const n=P(),r=S.res,k=S.round.sport,p=person(),cs=S.cs==null?4:S.cs,imps=S.round.imp.map(i=>esc(n[i])),pl=imps.length>1;
+const HL={f1:"CHEQUERED FLAG!",football:"FULL-TIME!",ufc:"KNOCKOUT!",wwe:"MAIN EVENT!",basketball:"BUZZER BEATER!"}[k],gname=r.guesser!=null?esc(n[r.guesser]):"";
+const W={caught:["THE CREW WINS",pl?"Every impostor was caught.":"The impostor was caught."],failed:["THE CREW WINS","The impostor was caught and failed to steal the win."],stolen:["THE IMPOSTOR STEALS THE WIN",gname+" guessed the secret athlete correctly."],escaped:["THE IMPOSTOR ESCAPES",r.tie?"The vote was tied or empty.":"The vote didn't catch every impostor."]}[r.how];
+const a=x=>cs===x?" pop":"";
+return`${banner()}<div class="cine${cs===1?" shake":""}">
+${cs===0?`<div class="card center countdown"><div class="cd">${S.cd}</div><p class="mu">The impostor is revealed in...</p></div>`:""}
+${cs>=1?`${cs===1?'<div class="fx"></div>':""}<div class="card center stage${a(1)} ${r.winner==="imp"?"imp":""}"><div class="hl">${HL}</div><p class="mu" style="margin:8px 0 0">${pl?"The impostors were":"The impostor was"}</p><div class="impname">${imps.join('<span class="amp"> &amp; </span>')}</div></div>`:""}
+${cs===2?vfx(k,r.winner):""}${cs>=2?`<div class="win${a(2)} ${r.winner}"><h2>${W[0]}</h2><p class="mu">${W[1]}</p></div>`:""}
+${cs>=3?`<div class="card center ath${a(3)}"><div class="mu small">The secret athlete was...</div><div class="athname">${esc(p.name)}</div><div class="mu small">${esc(p.roles[k])}${p.team?" &middot; "+esc(p.team):""}</div>${S.round.decoy?`<div class="mu small" style="margin-top:6px">The impostor was secretly given ${esc((DB.find(x=>x.id===S.round.decoy)||{name:"someone else"}).name)}.</div>`:""}</div>`:""}
+${cs>=4&&S.round.chaos?`<p class="mu small center">Chaos group rule: ${esc(S.round.chaos.shared)}</p>`:""}
+</div>${cs>=4?btn("again","Play again")+btn("play","Change settings","alt")+btn("home","Home","alt"):cs>=1?btn("skip","Skip","alt"):""}`},
+tests(){const r=runTests();return`<div class="bar"><button data-a="home">&larr; Home</button><span class="mu small">Self-tests</span><span></span></div><div class="card"><b class="${r.fail?"err":""}">${r.pass} passed, ${r.fail} failed</b><ul class="small mu">${r.log.map(l=>`<li>${esc(l)}</li>`).join("")}</ul></div>`}
+};
+function runTests(){const log=[];let pass=0,fail=0;const t=(m,c)=>{c?pass++:(fail++,log.push("FAIL: "+m))};
+const ids=DB.map(p=>p.id);t("no duplicate ids",new Set(ids).size===ids.length);
+for(const s in SPORTS)t(s+" has 50+ people",DB.filter(p=>p.sports.includes(s)).length>=50);
+t("Brock Lesnar in UFC and WWE once",DB.filter(p=>p.name==="Brock Lesnar").length===1&&DB.find(p=>p.name==="Brock Lesnar").sports.length===2);
+for(const[n,k]of[[3,1],[6,1],[12,3],[8,2],[10,3]]){for(let it=0;it<300;it++){const r=makeRound(n,k,Object.keys(SPORTS),"random",[]);if(r.imp.length!==k||new Set(r.imp).size!==k||r.imp.some(i=>i<0||i>=n)||!DB.find(p=>p.id===r.pid)){t("roles "+n+"/"+k,false);break}}t("roles ok "+n+"p/"+k+"imp",true)}
+let used=[],dup=false;for(let i=0;i<20;i++){const r=makeRound(4,1,["ufc"],"hard",used);if(used.includes(r.pid)&&poolFor(["ufc"],"hard").list.length>used.length)dup=true;used.push(r.pid)}t("no repeat person within a session",!dup);
+t("maxImp limits",maxImp(3)===1&&maxImp(12)===3);
+let j=judge([0,3,1],[1]);t("caught",j.crewWin&&j.caught[0]===1);
+j=judge([2,2,1],[0]);t("tie => escape",j.tie&&!j.crewWin);
+j=judge([0,0,0],[0]);t("empty => escape",!j.crewWin);
+j=judge([3,3,0,0,0],[0,1]);t("2 imps both caught",j.crewWin);
+j=judge([3,1,3,0,0],[0,1]);t("2 imps one caught => escape",!j.crewWin);
+j=judge([3,2,2,0,0],[0,1]);t("tie at cutoff => escape",!j.crewWin);
+let hb=0;for(const p of DB)for(let i=0;i<5;i++){const h=clueFor(p,p.sports);if(!h||h.toLowerCase().includes(p.name.toLowerCase()))hb++}t("hints exist and never contain the full name",hb===0);
+for(const s in SPORTS)for(const L of"EMH")t(s+" tier "+L+" has 12+ people",DB.filter(p=>p.sports.includes(s)&&p.diff===L).length>=12);
+{const J=(v,i)=>judge(v,i);const c1=J([0,3,1],[1]),e1=J([2,2,1],[0]),m1=J([3,1,3,0,0],[0,1]),m2=J([3,3,0,0,0],[0,1]);
+t("no guess: caught => crew",outcome(c1,false).winner==="crew");t("guess correct => impostor steals",outcome(c1,true,true).how==="stolen");t("guess wrong => crew",outcome(c1,true,false).how==="failed");
+t("tie never triggers guess",outcome(e1,true,true).how==="escaped");t("partial catch escapes",outcome(m1,true,true).how==="escaped");t("all impostors caught triggers guess",m2.crewWin&&outcome(m2,true,false).winner==="crew");
+for(const sp of Object.keys(SPORTS)){const ch=makeChaos(12,sp);t("chaos 12 unique rules "+sp,new Set(ch.per).size===12&&ch.hint.length===12&&!!ch.shared)}
+const ch2=makeChaos(3,"ufc");t("chaos rules for every player",ch2.per.every(Boolean)&&ch2.hint.every(Boolean));
+let leak=0;for(let i=0;i<200;i++){const r=makeRound(6,2,Object.keys(SPORTS),"random",[]);const pp=DB.find(x=>x.id===r.pid);const ch=makeChaos(6,pp.sports[0]);if(new RegExp("(^|[^a-z])"+pp.name.toLowerCase().replace(/[^a-z0-9 ]/g,".")+"([^a-z]|$)").test(JSON.stringify(ch).toLowerCase()))leak++}t("chaos rules never contain the athlete",leak===0)}
+{const au=auditChaos();t("chaos audit clean"+(au.length?": "+au.slice(0,3).join("; "):""),au.length===0);
+const bad1=checkChaos({shared:SHARED[0].t,per:["Keep a poker face and never laugh.","Give your clue a dramatic title."],hint:[SHARED[0].c[0],SHARED[0].c[0]]},2,"ufc");t("checker catches a rule conflict",bad1.some(x=>x.startsWith("conflict")));
+t("checker catches duplicates",checkChaos({shared:SHARED[1].t,per:[IND[2],IND[2]],hint:[SHARED[1].c[0],SHARED[1].c[0]]},2,"ufc").some(x=>x.includes("duplicate")));
+t("checker catches wrong-sport rule",checkChaos({shared:SHARED[1].t,per:[INDS.football[0],IND[2]],hint:[SHARED[1].c[0],SHARED[1].c[0]]},2,"ufc").some(x=>x.startsWith("wrong sport")));
+let cf=0;for(let i=0;i<300;i++){const si=SHARED.findIndex(x=>x.t==="Everyone must use an exaggerated reaction at least once.");const ch=makeChaos(12,"wwe");if(ch.shared===SHARED[si].t&&ch.per.includes("Keep a poker face and never laugh."))cf++}t("poker face never paired with exaggerated-reaction rule",cf===0);
+{let dd=0;for(let i=0;i<300;i++){const sp=Object.keys(SPORTS)[i%Object.keys(SPORTS).length],pool=DB.filter(x=>x.sports.includes(sp)),pp=pool[rnd(pool.length)],id=decoyFor(pp,sp),d=DB.find(x=>x.id===id);if(!d||d.id===pp.id||!d.sports.includes(sp))dd++}t("mole decoy is a different athlete from the same sport",dd===0)}
+for(const k of Object.keys(SPORTS))for(const w of["crew","imp"])t("win animation "+k+"/"+w,/vfx/.test(vfx(k,w))&&vfx(k,w)!==vfx(k,w==="crew"?"imp":"crew"))}
+{const all=(ERA.L+"|"+ERA.C).split("|"),miss=all.filter(n=>!DB.some(p=>p.name===n));t("era lists match the database"+(miss.length?": "+miss.slice(0,6).join(", "):""),!miss.length);
+for(const s of Object.keys(SPORTS))for(const E of"LMC")t("era "+E+" has 8+ in "+s,DB.filter(p=>p.sports.includes(s)&&p.era===E).length>=8);
+let bad=0;for(const e of["legends","modern","current"])for(let i=0;i<60;i++){const sp=[Object.keys(SPORTS)[i%5]],r=makeRound(5,1,sp,"random",[],e),pp=DB.find(x=>x.id===r.pid);if(pp.era!=={legends:"L",modern:"M",current:"C"}[e])bad++}t("era filter only draws from that era",bad===0);
+let nf=0,nar=0,jn=0;for(const p of DB)for(const s of p.sports){const F=FACTS(p,s);if(!F.length)nf++;for(const f of F)if(fit(s,f.k)<8)nar++}t("every person has hint facts; none fit fewer than 8 athletes",nf===0&&nar===0);
+for(let i=0;i<150;i++){const p=DB[rnd(DB.length)],h=clueFor(p,p.sports,"clear");if(!h||h.toLowerCase().includes(p.name.toLowerCase()))jn++}t("clear hints are valid",jn===0);
+const sp0=DB.filter(p=>p.sports.includes("football")),narrow=sp0.filter(p=>clueFor(p,["football"],"subtle")).length;t("subtle hints build for all football people",narrow===sp0.length)}
+return{pass,fail,log:log.length?log:["All checks passed."]}}
+function modal(){if(!S.confirm)return"";const r=S.confirm==="restart";return`<div class="modal" role="dialog" aria-modal="true"><div class="card"><h2>${r?"Restart round?":"Go home?"}</h2><p class="mu">${r?"A new secret person is picked and everyone sees their role again.":"This ends the current game. You can start a new one from setup."}</p>${btn("yes",r?"Restart round":"Go home")}${btn("no","Cancel","alt")}</div></div>`}
+function activeKey(){return S.round&&S.round.sport&&!["home","setup","tests"].includes(S.phase)?S.round.sport:null}
+function theme(){if(!document.body)return;const k=activeKey();document.body.dataset.t=k||"";const b=document.getElementById("bg");if(b)b.innerHTML=k?ICON[k]:""}
+let LK=null;function render(){const y=window.pageYOffset||0;if(!["result","suspense"].includes(S.phase))clearTM();theme();const p=S.phase;document.getElementById("app").innerHTML=(V[p]||V.home)()+modal();const K=p+(p==="handover"?S.ri+"/"+S.shown:"");if(!S.confirm&&K!==LK)window.scrollTo(0,0);else window.scrollTo(0,y);LK=K}
+if(typeof document!=="undefined"&&document.getElementById("app"))render();
+</script></body></html>
